@@ -20,4 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 4.2.1"
 
   s.add_development_dependency "sqlite3"
+  s.add_development_dependency "guard"
+  s.add_development_dependency "guard-minitest"
+  s.add_development_dependency "byebug"
 end

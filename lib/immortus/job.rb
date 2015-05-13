@@ -26,15 +26,15 @@ module Immortus
     private
 
     def tracker_create
-      Immortus::Job.strategy.job_enqueued(self.job_id)
+      self.class.strategy.job_enqueued(self.job_id)
     end
 
     def tracker_mark_started
-      Immortus::Job.strategy.job_started(self.job_id)
+      self.class.strategy.job_started(self.job_id)
     end
 
     def tracker_finish_job
-      Immortus::Job.strategy.job_finished(self.job_id)
+      self.class.strategy.job_finished(self.job_id)
     end
 
     ACTIVE_JOB_ADAPTER_DEFAULT_STRATEGY = {

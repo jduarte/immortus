@@ -1,5 +1,9 @@
 module Immortus
   module TrackingStrategy
+    class DelayedJobORM < ActiveRecord::Base
+      set_table_name "delayed_jobs"
+    end
+
     class DelayedJobStrategy
       def job_enqueued(job_id)
       end
@@ -11,7 +15,7 @@ module Immortus
       end
 
       def find(job_id)
-        Delayed::Job.where("handler LIKE ?", "%#{job_id}%").first
+        DelayedJobORM.where("handler LIKE ?", "%#{job_id}%").first
       end
 
       def status(job_id)
