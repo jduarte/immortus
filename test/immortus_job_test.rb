@@ -1,65 +1,51 @@
 require 'test_helper'
 require 'minitest/mock'
 require 'minitest/spec'
+require 'spy/integration'
+require 'immortus_empty_strategy'
+require 'minitest/stub_any_instance'
 
 class ImmortusJobTest < ActiveJob::TestCase
   extend Minitest::Spec::DSL
 
   let(:strategy_mock) { Minitest::Mock.new }
+  let(:strategy_spy_mock) { Spy.mock(Immortus::TrackingStrategy::EmptyStrategy) }
 
-  def test_unknown_active_job_strategy
-    ActiveJob::Base.queue_adapter = :test
-    assert_raises RuntimeError do
-      Immortus::Job.strategy
-    end
-  end
-
-  def test_known_active_job_strategy
-    ActiveJob::Base.queue_adapter = :delayed_job
-    assert_equal Immortus::TrackingStrategy::DelayedJobStrategy, Immortus::Job.strategy.class
-  end
-
-  def test_override_strategy
-    ::Rails.application.config.x.immortus.stub(:tracking_strategy, :delayed_job) do
-      assert_equal Immortus::TrackingStrategy::DelayedJobStrategy, Immortus::Job.strategy.class
-    end
-  end
-
-  def test_override_unknown_strategy
-    ::Rails.application.config.x.immortus.stub(:tracking_strategy, :unknown) do
-      assert_raises RuntimeError do
-        Immortus::Job.strategy
-      end
-    end
-  end
-
-  def test_tracker_create_is_called
+  def test_check_if_job_enqueue_callback_is_called
     strategy_mock.expect(:job_enqueued, nil, [String])
 
-    WaitABitJob.stub(:strategy, strategy_mock) do
+    WaitABitJob.stub_any_instance(:strategy, strategy_mock) do
       WaitABitJob.perform_later
     end
 
     assert strategy_mock.verify
   end
 
-  def test_tracker_mark_started_is_called
-    strategy_mock.expect(:job_started, nil, [String])
+  def test_check_if_job_started_callback_is_called
+    Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
+    job_started_callback = Spy.on(strategy_spy_mock, :job_started).and_call_through
+    Spy.on(strategy_spy_mock, :job_finished).and_call_through
 
-    WaitABitJob.stub(:strategy, strategy_mock) do
-      WaitABitJob.perform_now
+    WaitABitJob.stub_any_instance(:strategy, strategy_spy_mock) do
+      perform_enqueued_jobs do
+        WaitABitJob.perform_later
+      end
     end
 
-    assert strategy_mock.verify
+    assert job_started_callback.has_been_called?
   end
 
-  def test_tracker_finish_job_is_called
-    strategy_mock.expect(:job_finished, nil, [String])
+  def test_check_if_fob_finished_callback_is_called
+    Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
+    Spy.on(strategy_spy_mock, :job_started).and_call_through
+    job_finished_callback = Spy.on(strategy_spy_mock, :job_finished).and_call_through
 
-    WaitABitJob.stub(:strategy, strategy_mock) do
-      WaitABitJob.perform_now
+    WaitABitJob.stub_any_instance(:strategy, strategy_spy_mock) do
+      perform_enqueued_jobs do
+        WaitABitJob.perform_later
+      end
     end
 
-    assert strategy_mock.verify
+    assert job_finished_callback.has_been_called?
   end
 end

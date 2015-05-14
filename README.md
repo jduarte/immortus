@@ -249,10 +249,11 @@ ROADMAP
 
 1.0
 - [ ] Specs
-  - [X] existence of verify route
-  - [X] Immortus::Job Strategy
-  - [ ] Immortus::Job callbacks
-  - [ ] ...
+  - [X] Immortus controller
+  - [X] Immortus::StrategyFinder
+  - [X] Immortus::Job callbacks
+  - [ ] render_immortus
+  - [ ] Tracking Strategies
 - [ ] Build Initial Version
   - [X] Routes DSL (immortus_jobs)
   - [X] JS (Immortus.perform)

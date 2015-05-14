@@ -22,5 +22,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "guard"
   s.add_development_dependency "guard-minitest"
+  s.add_development_dependency "minitest-stub_any_instance"
+  s.add_development_dependency "spy"
   s.add_development_dependency "byebug"
+  s.add_development_dependency "delayed_job_active_record"
 end
