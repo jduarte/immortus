@@ -1,4 +1,6 @@
 module Immortus
+  class JobNotFound < StandardError; end
+
   class Job < ActiveJob::Base
     # include InlineTrackingStrategy
 
@@ -8,12 +10,12 @@ module Immortus
     after_perform :tracker_finish_job
 
     def strategy
-      @strategy ||= self.strategy_class.new
+      @strategy ||= strategy_class.new
     end
 
     private
 
-    def self.strategy_class
+    def strategy_class
       Immortus::StrategyFinder.find
     end
 
