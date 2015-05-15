@@ -247,14 +247,27 @@ Credits
 ROADMAP
 ---
 
-1.0
-- [ ] Specs
+0.1
+- [X] Initial Specs
   - [X] Immortus controller
   - [X] Immortus::StrategyFinder
   - [X] Immortus::Job callbacks
+  - [X] Tracking Strategies
+    - [X] Delayed Job (AR)
+- [X] Build Initial Version
+  - [X] Routes DSL ( immortus_jobs )
+  - [X] JS ( Immortus.perform )
+  - [X] JS ( Immortus.verify )
+  - [X] JS ( Immortus long polling )
+  - [X] Render ( render_immortus )
+  - [X] ImmortusController#verify
+    - [X] Tracking Strategies
+      - [X] Delayed Job ( AR )
+
+1.0
+- [ ] Specs
   - [ ] render_immortus
   - [ ] Tracking Strategies
-    - [X] Delayed Job (AR)
     - [ ] Backburner
     - [ ] Qu
     - [ ] Que
@@ -265,34 +278,19 @@ ROADMAP
     - [ ] Sucker Punch
     - [ ] Active Job Inline
 - [ ] LOGS
-- [ ] Build Initial Version
-  - [X] Routes DSL (immortus_jobs)
-  - [X] JS (Immortus.perform)
-  - [X] JS (Immortus long polling)
-  - [X] Render (render_immortus)
-    - [ ] successfully enqueued?
-  - [X] ImmortusController#verify
-    - [ ] build strategies to support all ActiveJob adapters
-      - [X] Delayed Job (AR)
-      - [ ] Backburner
-      - [ ] Qu
-      - [ ] Que
-      - [ ] queue_classic
-      - [ ] Resque
-      - [ ] Sidekiq
-      - [ ] Sneakers
-      - [ ] Sucker Punch
-      - [ ] Active Job Inline
-    - [ ] check job status
-- [ ] Review README.md
-- [ ] Release
+- [ ] Tracking Strategies
+  - [ ] Backburner
+  - [ ] Qu
+  - [ ] Que
+  - [ ] queue_classic
+  - [ ] Resque
+  - [ ] Sidekiq
+  - [ ] Sneakers
+  - [ ] Sucker Punch
+  - [ ] Active Job Inline
 
 1.1
-- [X] JS ( Immortus.verify )
-- [ ] Keep track even after a refresh
-
-1.2
-- [ ] Remove jQuery dependency (ajax request using xmlhttp)
+- [ ] Remove jQuery dependency ( ajax request using xmlhttp )
 - [ ] Error handling: http://www.sitepoint.com/dont-get-activejob/
 - [ ] progress bar?: https://www.infinum.co/the-capsized-eight/articles/progress-bar-in-rails
 - [ ] How to handle jobs that are divided into multiple sub-jobs
@@ -300,7 +298,7 @@ ROADMAP
 Later
 - [ ] WebSockets support
 - [ ] ActionCable support
-- [ ] Remove ActiveJob dependency (support using Backends directly "Delayed Job", "Sidekiq", etc)
+- [ ] Remove ActiveJob dependency ( support using Backends directly "Delayed Job", "Sidekiq", etc )
 - [ ] Remove Rails dependency
 - [ ] Config Inline Immortus::Job Strategy
   - [ ] Change Router DSL to support specify verify url
