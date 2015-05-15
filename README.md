@@ -254,6 +254,17 @@ ROADMAP
   - [X] Immortus::Job callbacks
   - [ ] render_immortus
   - [ ] Tracking Strategies
+    - [X] Delayed Job (AR)
+    - [ ] Backburner
+    - [ ] Qu
+    - [ ] Que
+    - [ ] queue_classic
+    - [ ] Resque
+    - [ ] Sidekiq
+    - [ ] Sneakers
+    - [ ] Sucker Punch
+    - [ ] Active Job Inline
+- [ ] LOGS
 - [ ] Build Initial Version
   - [X] Routes DSL (immortus_jobs)
   - [X] JS (Immortus.perform)
@@ -262,7 +273,7 @@ ROADMAP
     - [ ] successfully enqueued?
   - [X] ImmortusController#verify
     - [ ] build strategies to support all ActiveJob adapters
-      - [X] Delayed Job
+      - [X] Delayed Job (AR)
       - [ ] Backburner
       - [ ] Qu
       - [ ] Que
