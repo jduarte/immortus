@@ -1,7 +1,7 @@
 module Immortus
   class JobNotFound < StandardError; end
 
-  class Job < ::ActiveJob::Base
+  class Job < ActiveJob::Base
     # include InlineTrackingStrategy
 
     # cattr_accessor :inline_strategy

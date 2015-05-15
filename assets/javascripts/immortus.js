@@ -48,7 +48,7 @@ var Immortus = (function() {
           var success = textStatus === 'success';
           if(!success || data.completed) {
             clearInterval(that.interval);
-            that.completed(data.success);
+            that.completed(that.job_id, data.success);
           }
         }
       );

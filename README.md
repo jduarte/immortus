@@ -198,18 +198,30 @@ end
 Then call it from whenever you want from your Javascript:
 
 ```javascript
+var showLoadingIcon = function() {
+  // called at the beginning of Immortus.perform
+}
+
+var checkIfJobWasStarted = function(job_id, enqueue_successfull) {
+  // called at the end of Immortus.perform
+  // if (!enqueue_successfull) { no long pooling is done and job_id is undefined }
+}
+
+var removeLoadingIcon = function(job_id, successfull) {
+  // Handle success or error
+  // No more long pooling
+}
+
 Immortus.perform({
   url: '/generate_invoice',
   longpolling: {
     interval: 1000
   },
-  beforeSend: showRedCog,
-  afterEnqueue: showYellowCog,
-  completed: showSuccessOrErrorIcon
+  beforeSend: showLoadingIcon,
+  afterEnqueue: checkIfJobWasStarted,
+  completed: removeLoadingIcon
 });
 ```
-
-We assume `showSuccessOrErrorIcon`, `showRedCog` and `showYellowCog` are javascript functions with logic to handle each situation
 
 Development
 ---
@@ -338,7 +350,7 @@ Immortus.perform({
   afterEnqueue: function(job_id, enqueue_successfull) {
     // executed after ajax request
   },
-  completed: function(successfull) {
+  completed: function(job_id, successfull) {
     // executed when job is completed
   }
 });
