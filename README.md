@@ -11,7 +11,7 @@ Anytime you need to keep track of an async job, like:
 
 - send emails
 - upload or process an image
-- export .xls or .csv
+- import / export files ( .xls, .csv, ... )
 - etc
 
 ### What Immortus do?
@@ -26,7 +26,9 @@ Requirements
 ---
 
 - Rails
-- ActiveJob gem: `gem 'activejob'` if rails >= 4.2 or `gem 'activejob_backport'` if rails >= 4.0 and < 4.2
+- ActiveJob gem:
+  - `gem 'activejob'` if rails >= 4.2
+  - `gem 'activejob_backport'` and it's initializer if rails >= 4.0 and < 4.2
 - jQuery
 
 Installation
@@ -126,17 +128,14 @@ TODO: Add more default tracking strategies for ActiveJob adapters later, like:
 You can always override the default strategy if you'd like:
 
 ```ruby
-# config/application.rb
-Rails::Application.configuration do |config|
-  # ...
-  config.immortus.tracking_strategy = Immortus::TrackingStrategy::RedisPubSubStrategy
-end
+# config/initializer/immortus.rb
+Immortus::Job.tracking_strategy = Immortus::TrackingStrategy::RedisPubSubStrategy
 ```
 
 You can define your own persistence strategy if you'd like:
 
 ```ruby
-# app/jobs/tracking_strategies/my_custom_tracking_strategy.rb
+# app/jobs/tracking_strategy/my_custom_tracking_strategy.rb
 class MyCustomTrackingStrategy
   def find(job_id)
     MyCustomTrackingJobTable.find_by(job_id: job_id)

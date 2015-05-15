@@ -2,7 +2,12 @@ module Immortus
   class JobNotFound < StandardError; end
 
   class Job < ActiveJob::Base
+    mattr_reader(:tracking_strategy)
     # include InlineTrackingStrategy
+
+    def self.tracking_strategy=(strategy)
+      @@tracking_strategy = strategy
+    end
 
     # cattr_accessor :inline_strategy
     after_enqueue :tracker_create

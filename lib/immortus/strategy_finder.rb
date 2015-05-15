@@ -49,7 +49,7 @@ module Immortus
     private
 
     def self.immortus_config_strategy
-      ::Rails.application.config.x.immortus.tracking_strategy
+      Immortus::Job.tracking_strategy
     end
 
     def self.active_job_adapter_default_strategy
