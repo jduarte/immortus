@@ -84,9 +84,11 @@ Rails.application.routes.draw do
 end
 ```
 > This will create under the hood:
-> get '/immortus/verify/:job_id', to: 'immortus#verify_job', as: :verify_immortus_job
-> post '/generate_invoice', to: 'invoices#generate', as: :generate_invoice
-> # other routes to jobs ...
+```ruby
+get '/immortus/verify/:job_id', to: 'immortus#verify_job', as: :verify_immortus_job
+post '/generate_invoice', to: 'invoices#generate', as: :generate_invoice
+# other routes to jobs ...
+```
 
 You should create your controller in ...
 
@@ -100,11 +102,13 @@ class InvoicesController < ApplicationController
 end
 ```
 > 'render_immortus' under the hoods is doing:
-> if job.enqueued?
->   render json: { job_id: job.job_id }
-> else
->   render json: { error: "An error occurred enqueing the job. #{job.error_exception}" }, status: 500
-> end
+```ruby
+if job.enqueued?
+  render json: { job_id: job.job_id }
+else
+  render json: { error: "An error occurred enqueing the job. #{job.error_exception}" }, status: 500
+end
+```
 
 Where you previously have an ActiveJob call
 
