@@ -32,18 +32,14 @@ module Immortus
 
     def self.find
       strategy = immortus_config_strategy || active_job_adapter_default_strategy
-      raise StrategyNotFound, 'Strategy does not seams to be setted' if strategy.blank?
+      raise StrategyNotFound, 'Strategy does not seems to be setted' if strategy.blank?
       if strategy.is_a?(Class)
         strategy
       elsif strategy.is_a?(Symbol)
         begin
           "#{strategy.to_s.camelize}".constantize
         rescue
-          begin
-            default_namespace strategy
-          rescue
-            raise StrategyNotFound, 'Could not find strategy, please specify full namespace ex: MyApp::MyOverrides::MyCustomStrategy'
-          end
+          default_namespace strategy
         end
       else
         raise StrategyNotFound, 'Strategy Not Found'
@@ -58,12 +54,11 @@ module Immortus
 
     def self.active_job_adapter_default_strategy
       sym = ::Rails.application.config.active_job.queue_adapter
-      return nil if sym == :not_implemented
 
       strategy = default_namespace MAP_ACTIVE_JOB_ADAPTER_TO_DEFAULT_STRATEGY[sym]
 
       Array(MAP_ACTIVE_JOB_ADAPTER_TO_REQUIREMENTS[sym]).each do |requirement|
-        require requirement rescue LoadError
+        require requirement
       end
 
       strategy
@@ -77,7 +72,7 @@ module Immortus
       begin
         "Immortus::TrackingStrategy::#{strategy_class_name.camelize}".constantize
       rescue
-        raise StrategyNotFound, 'Could not find strategy in Immortus::TrackingStrategy namespace'
+        raise StrategyNotFound, 'Could not find strategy in Immortus::TrackingStrategy namespace, please specify full namespace ex: MyApp::MyOverrides::MyCustomStrategy'
       end
     end
   end
