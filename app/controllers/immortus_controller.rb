@@ -1,4 +1,4 @@
-class ImmortusController < ApplicationController
+class ImmortusController < ActionController::Base
   def verify
     job_status = Immortus::StrategyFinder.find.new.status params[:job_id]
 
