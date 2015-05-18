@@ -22,8 +22,7 @@ var Immortus = (function() {
     $.ajax({
       url: this.url,
       dataType: 'json'
-    })
-    .always(
+    }).always(
       function(data, textStatus, jqXHR) {
         that.job_id = data.job_id;
         var success = textStatus === 'success';
@@ -42,13 +41,16 @@ var Immortus = (function() {
       $.ajax({
         url: '/immortus/verify/' + that.job_id,
         dataType: 'json'
-      })
-      .always(
+      }).always(
         function(data, textStatus, jqXHR) {
-          var success = textStatus === 'success';
-          if(!success || data.completed) {
+          var req_success = textStatus === 'success';
+          if(!req_success || data.completed) {
             clearInterval(that.interval);
-            that.completed(that.job_id, data.success);
+            if (req_success) {
+              that.completed(that.job_id, data.success);
+            } else {
+              that.completed(that.job_id, false);
+            }
           }
         }
       );
