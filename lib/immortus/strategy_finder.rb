@@ -70,10 +70,12 @@ module Immortus
       strategy_class_name = strategy_class_sym.to_s
       strategy_class_name << '_strategy' unless strategy_class_name.ends_with? '_strategy'
 
+      strategy_class_name = "Immortus::TrackingStrategy::#{strategy_class_name.camelize}"
+
       begin
-        "Immortus::TrackingStrategy::#{strategy_class_name.camelize}".constantize
+        strategy_class_name.constantize
       rescue
-        raise StrategyNotFound, 'Could not find strategy in Immortus::TrackingStrategy namespace, please specify full namespace ex: MyApp::MyOverrides::MyCustomStrategy'
+        raise StrategyNotFound, "Could not find strategy #{strategy_class_name}"
       end
     end
   end
