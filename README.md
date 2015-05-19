@@ -136,34 +136,36 @@ You can define your own persistence strategy if you'd like:
 
 ```ruby
 # app/jobs/tracking_strategy/my_custom_tracking_strategy.rb
-class MyCustomTrackingStrategy
-  def find(job_id)
-    MyCustomTrackingJobTable.find_by(job_id: job_id)
-  end
+module TrackingStrategy
+  class MyCustomTrackingStrategy
+    def find(job_id)
+      MyCustomTrackingJobTable.find_by(job_id: job_id)
+    end
 
-  def job_enqueued(job_id)
-    # Save somewhere that this job was created
-    MyCustomTrackingJobTable.create! job_id: job_id, status: 'created'
-  end
+    def job_enqueued(job_id)
+      # Save somewhere that this job was created
+      MyCustomTrackingJobTable.create! job_id: job_id, status: 'created'
+    end
 
-  def job_started(job_id)
-    find(job_id).update_attributes(status: 'started')
-  end
+    def job_started(job_id)
+      find(job_id).update_attributes(status: 'started')
+    end
 
-  def status(job_id)
-    # Ensure you return one of 4 status
-    # :created => 'Job was created but wasnt started yet'
-    # :started => 'Job was started'
-    # :finished_error => 'An error occurred running the job'
-    # :finished_success => 'Job was finished'
+    def status(job_id)
+      # Ensure you return one of 4 status
+      # :created => 'Job was created but wasnt started yet'
+      # :started => 'Job was started'
+      # :finished_error => 'An error occurred running the job'
+      # :finished_success => 'Job was finished'
 
-    tracker = find(job_id)
-    tracker.status.to_sym
-  end
+      tracker = find(job_id)
+      tracker.status.to_sym
+    end
 
-  def job_finished(job_id)
-    tracker = find(job_id)
-    tracker.destroy
+    def job_finished(job_id)
+      tracker = find(job_id)
+      tracker.destroy
+    end
   end
 end
 
