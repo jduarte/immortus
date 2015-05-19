@@ -15,22 +15,12 @@ class ImmortusControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'success status' do
-    empty_strategy.stub_any_instance(:status, :finished_success) do
+  test 'finished status' do
+    empty_strategy.stub_any_instance(:status, :finished) do
       Immortus::StrategyFinder.stub(:find, empty_strategy) do
         response = get :verify, job_id: '1'
         response_json = JSON.parse(response.body)
         assert_equal true, response_json["completed"] && response_json["success"]
-      end
-    end
-  end
-
-  test 'error status' do
-    empty_strategy.stub_any_instance(:status, :finished_error) do
-      Immortus::StrategyFinder.stub(:find, empty_strategy) do
-        response = get :verify, job_id: '1'
-        response_json = JSON.parse(response.body)
-        assert_equal true, response_json["completed"] && !response_json["success"]
       end
     end
   end

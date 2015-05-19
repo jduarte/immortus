@@ -9,10 +9,16 @@ var Immortus = (function() {
     this.interval_milliseconds = options.longpolling.interval;
     this.url = options.url;
     this.job_id = options.job_id;
-    this.setup = options.setup || function() { };
+
+    // to be used in both Immortus.perform and Immortus.verify
+    this.completed = options.completed || function() { };
+
+    // to be used in Immortus.perform
     this.beforeSend = options.beforeSend || function() { };
     this.afterEnqueue = options.afterEnqueue || function() { };
-    this.completed = options.completed || function() { };
+
+    // to be used in Immortus.verify
+    this.setup = options.setup || function() { };
   }
 
   Immortus.prototype.init = function() {

@@ -9,7 +9,7 @@ class ImmortusStrategyFinderTest < ActiveJob::TestCase
 
   # #fail raise Immortus::StrategyNotFound
   def test_unknown_active_job_strategy
-    ::Rails.application.config.active_job.stub(:queue_adapter, :unkwown) do
+    ::Rails.application.config.active_job.stub(:queue_adapter, :unknown) do
       assert_raises Immortus::StrategyNotFound do
         Immortus::StrategyFinder.find
       end

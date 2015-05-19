@@ -25,9 +25,7 @@ When you need to keep track of an async job. For example:
 
 - Rails ( >= 4.0 )
 - ActiveJob
-
-  - `gem 'activejob'` if rails >= 4.2
-  - `gem 'activejob_backport'` and it's initializer if rails >= 4.0 and < 4.2
+  - Add `gem 'activejob_backport'` to Gemfile if 4.0 <= Rails < 4.2
 - jQuery
 
 ### Installation
@@ -113,7 +111,7 @@ Require Immortus in your manifest file ( make sure jQuery is included at this po
 //= require immortus
 ```
 
-Call it on your JS wherever you like:
+To create and track an async job call in your JS:
 
 ```javascript
 var logBeforeSend = function() { console.log('executed before AJAX request'); }
@@ -123,11 +121,28 @@ var logCompleted = function(job_id, successfull) { console.log('job ' + job_id +
 Immortus.perform({
   url: '/generate_invoice',
   longpolling: {
+    interval: 2000,               // Defaults to 1000
+  },
+  beforeSend: logBeforeSend,      // Defaults to empty function
+  afterEnqueue: logAfterEnqueue,  // Defaults to empty function
+  completed: logCompleted         // Defaults to empty function
+});
+```
+
+To only track an existing job without creating it:
+
+```javascript
+Immortus.verify({
+  job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
+  longpolling: {
     interval: 1000
   },
-  beforeSend: logBeforeSend,
-  afterEnqueue: logAfterEnqueue,
-  completed: logCompleted
+  setup: function() {
+    // executed before the first verify ajax request
+  },
+  completed: function(successfull) {
+    // executed when job is completed
+  }
 });
 ```
 
@@ -169,33 +184,35 @@ Immortus::Job.tracking_strategy = :redis_pub_sub_strategy
 # app/jobs/tracking_strategy/my_custom_tracking_strategy.rb
 module TrackingStrategy
   class MyCustomTrackingStrategy
-    def find(job_id)
-      MyCustomTrackingJobTable.find_by(job_id: job_id)
-    end
 
     def job_enqueued(job_id)
-      # Save somewhere that this job was created
-      MyCustomTrackingJobTable.create! job_id: job_id, status: 'created'
+      # Save in a custom table that this job was created
+      MyCustomTrackingJobTable.create!(job_id: job_id, status: 'created')
     end
 
     def job_started(job_id)
       find(job_id).update_attributes(status: 'started')
     end
 
-    def status(job_id)
-      # Ensure you return one of 4 status
-      # :created => Job was created but wasn't started yet
-      # :started => Job was started
-      # :finished_error => An error occurred running the job
-      # :finished_success => Job was finished
-
-      tracker = find(job_id)
-      tracker.status.to_sym
+    def job_finished(job_id)
+      job = find(job_id)
+      job.update_attributes(status: 'finished')
     end
 
-    def job_finished(job_id)
-      tracker = find(job_id)
-      tracker.destroy
+    def status(job_id)
+      # Ensure you return one of 3 poosible statuses
+        # :created => Job was created but wasn't started yet
+        # :started => Job was started
+        # :finished => Job was finished
+
+      job = find(job_id)
+      job.status.to_sym
+    end
+
+    private
+
+    def find(job_id)
+      MyCustomTrackingJobTable.find_by(job_id: job_id)
     end
   end
 end
@@ -253,6 +270,10 @@ ROADMAP
   - [ ] `beforeSend`, `afterEnqueue`, `completed` callbacks  function arguments defenition
     - [ ] Will it be able for `completed` to have a flag `success` or not? How should this work if possible?
 - [ ] Rewrite what render_immortus(job) does under the hood in the README
+- [ ] Setup testing environment to work with different Ruby versions and Rails versions
+- [ ] How `Immortus.perform` and `Immortus.verify` handle if AJAX requests returns an error ( 404/500/etc )
+- [ ] ImmortusController#verify seems to be duplicating info with `completed` and `success` in the response JSON
+- [ ] Use a consistent specs/tests syntax
 
 1.0
 
@@ -295,19 +316,3 @@ Later
 - [ ] Remove Rails dependency
 - [ ] Config Inline Immortus::Job Strategy
   - [ ] Change Router DSL to support specify verify url
-To track an existing job:
-
-```javascript
-Immortus.verify({
-  job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
-  longpolling: {
-    interval: 1000
-  },
-  setup: function() {
-    // executed before the first verify ajax request
-  },
-  completed: function(successfull) {
-    // executed when job is completed
-  }
-});
-```

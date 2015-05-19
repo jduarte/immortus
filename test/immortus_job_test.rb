@@ -11,7 +11,7 @@ class ImmortusJobTest < ActiveJob::TestCase
   let(:strategy_mock) { Minitest::Mock.new }
   let(:strategy_spy_mock) { Spy.mock(Immortus::TrackingStrategy::EmptyStrategy) }
 
-  def test_check_if_job_enqueue_callback_is_called
+  def test_job_enqueued_callback_is_called
     strategy_mock.expect(:job_enqueued, nil, [String])
 
     WaitABitJob.stub_any_instance(:strategy, strategy_mock) do
@@ -21,7 +21,7 @@ class ImmortusJobTest < ActiveJob::TestCase
     assert strategy_mock.verify
   end
 
-  def test_check_if_job_started_callback_is_called
+  def test_job_started_callback_is_called
     Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
     job_started_callback = Spy.on(strategy_spy_mock, :job_started).and_call_through
     Spy.on(strategy_spy_mock, :job_finished).and_call_through
@@ -35,7 +35,7 @@ class ImmortusJobTest < ActiveJob::TestCase
     assert job_started_callback.has_been_called?
   end
 
-  def test_check_if_fob_finished_callback_is_called
+  def test_job_finished_callback_is_called
     Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
     Spy.on(strategy_spy_mock, :job_started).and_call_through
     job_finished_callback = Spy.on(strategy_spy_mock, :job_finished).and_call_through
@@ -47,5 +47,28 @@ class ImmortusJobTest < ActiveJob::TestCase
     end
 
     assert job_finished_callback.has_been_called?
+  end
+
+  def test_job_finished_should_not_be_called_if_job_execution_raises_an_exception
+    Spy.on(strategy_spy_mock, :job_started).and_call_through
+    Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
+    job_finished_callback = Spy.on(strategy_spy_mock, :job_finished).and_call_through
+
+    ErrorRaiseJob.stub_any_instance(:strategy, strategy_spy_mock) do
+      perform_enqueued_jobs do
+        begin
+          ErrorRaiseJob.perform_later
+        rescue
+        end
+      end
+    end
+
+    assert !job_finished_callback.has_been_called?
+  end
+
+  def test_strategy_class_should_call_StrategyFinder_find
+    find_spy = Spy.on(Immortus::StrategyFinder, :find)
+    Immortus::Job.strategy_class
+    assert find_spy.has_been_called?
   end
 end
