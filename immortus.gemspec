@@ -7,14 +7,13 @@ require "immortus/version"
 Gem::Specification.new do |s|
   s.name        = "immortus"
   s.version     = Immortus::VERSION
-  s.authors     = ["Nuno Duarte"]
-  s.email       = ["n.duarte@runtime-revolution.com"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Immortus."
-  s.description = "TODO: Description of Immortus."
+  s.authors     = %Q{Runtime Revolution}
+  s.homepage    = "http://www.runtime-revolution.com/runtime"
+  s.summary     = %Q{Immortus is a background jobs tracking helper}
+  s.description = %Q{A rails gem to help tracking your background jobs in your application}
   s.license     = "MIT"
 
-  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "rails", ">= 4.0.0"
