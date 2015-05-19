@@ -118,8 +118,7 @@ Call it on your JS wherever you like:
 ```javascript
 var logBeforeSend = function() { console.log('executed before AJAX request'); }
 var logAfterEnqueue = function(job_id, enqueue_successfull) { console.log('job was enqueued'); }
-var logCompleted = function(job_id, successfull) { console.log('job ' + job_id + 'was finished with ' + (successfull ? 'success' : 'error'); }
-}
+var logCompleted = function(job_id, successfull) { console.log('job ' + job_id + 'was finished with ' + (successfull ? 'success' : 'error')); }
 
 Immortus.perform({
   url: '/generate_invoice',
@@ -161,7 +160,7 @@ Here is a list of the ActiveJob queue adapter and its mapped strategies:
 
 ```ruby
 # config/initializer/immortus.rb
-Immortus::Job.tracking\_strategy = :redis\_pub\_sub\_strategy
+Immortus::Job.tracking_strategy = :redis_pub_sub_strategy
 ```
 
 #### Define your own tracking strategy
@@ -185,10 +184,10 @@ module TrackingStrategy
 
     def status(job_id)
       # Ensure you return one of 4 status
-      # :created => 'Job was created but wasnt started yet'
-      # :started => 'Job was started'
-      # :finished_error => 'An error occurred running the job'
-      # :finished_success => 'Job was finished'
+      # :created => Job was created but wasn't started yet
+      # :started => Job was started
+      # :finished_error => An error occurred running the job
+      # :finished_success => Job was finished
 
       tracker = find(job_id)
       tracker.status.to_sym
@@ -202,9 +201,9 @@ module TrackingStrategy
 end
 
 # config/initializer/immortus.rb
-Immortus::Job.tracking\_strategy = :my\_custom\_tracking\_strategy
+Immortus::Job.tracking_strategy = :my_custom_tracking_strategy
 # you could also specify the class, it's mandatory if namespaced, like:
-# Immortus::Job.tracking\_strategy = TrackingStrategy::MyCustomTrackingStrategy
+# Immortus::Job.tracking_strategy = TrackingStrategy::MyCustomTrackingStrategy
 ```
 
 Development
