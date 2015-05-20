@@ -24,8 +24,7 @@ When you need to keep track of an async job. For example:
 ### Requirements
 
 - Rails ( >= 4.0 )
-- ActiveJob
-  - Add `gem 'activejob_backport'` to Gemfile if 4.0 <= Rails < 4.2
+- ActiveJob ( add `gem 'activejob_backport'` to Gemfile if 4.0 <= Rails < 4.2 )
 - jQuery
 
 ### Installation
@@ -168,8 +167,6 @@ Here is a list of the ActiveJob queue adapter and its mapped strategies:
 |          :sucker_punch |           N/A           |                         N/A                         |
 |                :inline |           N/A           |                         N/A                         |
 |                  :test |           N/A           |                         N/A                         |
-
-###
 
 #### Override the default strategy
 
