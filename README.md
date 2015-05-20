@@ -247,25 +247,25 @@ ROADMAP
 0.1
 
 - [X] Initial Specs
-  - [X] Immortus controller
-  - [X] Immortus::StrategyFinder
-  - [X] Immortus::Job callbacks
-  - [X] Tracking Strategies
-    - [X] Delayed Job (AR)
-- [X] Build Initial Version
-  - [X] Routes DSL ( immortus_jobs )
-  - [X] JS ( Immortus.perform )
-  - [X] JS ( Immortus.verify )
-  - [X] JS ( Immortus long polling )
-  - [X] Render ( render_immortus )
-  - [X] ImmortusController#verify
+    - [X] Immortus controller
+    - [X] Immortus::StrategyFinder
+    - [X] Immortus::Job callbacks
     - [X] Tracking Strategies
-      - [X] Delayed Job ( AR )
+        - [X] Delayed Job (AR)
+- [X] Build Initial Version
+    - [X] Routes DSL ( immortus_jobs )
+    - [X] JS ( Immortus.perform )
+    - [X] JS ( Immortus.verify )
+    - [X] JS ( Immortus long polling )
+    - [X] Render ( render_immortus )
+    - [X] ImmortusController#verify
+        - [X] Tracking Strategies
+            - [X] Delayed Job ( AR )
 - [ ] Define Immortus::Job Strategy interface and expected return values
-  - [ ] Wiki explaining on how inferred strategies work
+    - [ ] Wiki explaining on how inferred strategies work
 - [ ] Define Immortus.JS interface for handling successful and error responses
-  - [ ] `beforeSend`, `afterEnqueue`, `completed` callbacks  function arguments defenition
-    - [ ] Will it be able for `completed` to have a flag `success` or not? How should this work if possible?
+    - [ ] `beforeSend`, `afterEnqueue`, `completed` callbacks  function arguments defenition
+        - [ ] Will it be able for `completed` to have a flag `success` or not? How should this work if possible?
 - [ ] Rewrite what render_immortus(job) does under the hood in the README
 - [ ] Setup testing environment to work with different Ruby versions and Rails versions
 - [ ] How `Immortus.perform` and `Immortus.verify` handle if AJAX requests returns an error ( 404/500/etc )
@@ -275,8 +275,19 @@ ROADMAP
 1.0
 
 - [ ] Specs
-  - [ ] render_immortus
-  - [ ] Tracking Strategies
+    - [ ] render_immortus
+    - [ ] Tracking Strategies
+        - [ ] Backburner
+        - [ ] Qu
+        - [ ] Que
+        - [ ] queue_classic
+        - [ ] Resque
+        - [ ] Sidekiq
+        - [ ] Sneakers
+        - [ ] Sucker Punch
+        - [ ] Active Job Inline
+- [ ] LOGS
+- [ ] Tracking Strategies
     - [ ] Backburner
     - [ ] Qu
     - [ ] Que
@@ -286,17 +297,6 @@ ROADMAP
     - [ ] Sneakers
     - [ ] Sucker Punch
     - [ ] Active Job Inline
-- [ ] LOGS
-- [ ] Tracking Strategies
-  - [ ] Backburner
-  - [ ] Qu
-  - [ ] Que
-  - [ ] queue_classic
-  - [ ] Resque
-  - [ ] Sidekiq
-  - [ ] Sneakers
-  - [ ] Sucker Punch
-  - [ ] Active Job Inline
 
 1.1
 
@@ -308,8 +308,8 @@ ROADMAP
 Later
 
 - [ ] WebSockets support
-  - [ ] ActionCable support
+    - [ ] ActionCable support
 - [ ] Remove ActiveJob dependency ( support using Backends directly "Delayed Job", "Sidekiq", etc )
 - [ ] Remove Rails dependency
 - [ ] Config Inline Immortus::Job Strategy
-  - [ ] Change Router DSL to support specify verify url
+    - [ ] Change Router DSL to support specify verify url
