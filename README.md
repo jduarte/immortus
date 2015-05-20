@@ -134,14 +134,10 @@ To only track an existing job without creating it:
 Immortus.verify({
   job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
   longpolling: {
-    interval: 1000
+    interval: 2000,               // Defaults to 1000
   },
-  setup: function() {
-    // executed before the first verify ajax request
-  },
-  completed: function(successfull) {
-    // executed when job is completed
-  }
+  setup: logBeforeSend,           // Defaults to empty function
+  completed: logCompleted         // Defaults to empty function
 });
 ```
 
