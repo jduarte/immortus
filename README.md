@@ -242,21 +242,21 @@ ROADMAP
 
 0.1
 
-- [X] Initial Specs
-    - [X] Immortus controller
-    - [X] Immortus::StrategyFinder
-    - [X] Immortus::Job callbacks
-    - [X] Tracking Strategies
-        - [X] Delayed Job (AR)
-- [X] Build Initial Version
-    - [X] Routes DSL ( immortus_jobs )
-    - [X] JS ( Immortus.perform )
-    - [X] JS ( Immortus.verify )
-    - [X] JS ( Immortus long polling )
-    - [X] Render ( render_immortus )
-    - [X] ImmortusController#verify
-        - [X] Tracking Strategies
-            - [X] Delayed Job ( AR )
+- [x] Initial Specs
+    - [x] Immortus controller
+    - [x] Immortus::StrategyFinder
+    - [x] Immortus::Job callbacks
+    - [x] Tracking Strategies
+        - [x] Delayed Job (AR)
+- [x] Build Initial Version
+    - [x] Routes DSL ( immortus_jobs )
+    - [x] JS ( Immortus.perform )
+    - [x] JS ( Immortus.verify )
+    - [x] JS ( Immortus long polling )
+    - [x] Render ( render_immortus )
+    - [x] ImmortusController#verify
+        - [x] Tracking Strategies
+            - [x] Delayed Job ( AR )
 - [ ] Define Immortus::Job Strategy interface and expected return values
     - [ ] Wiki explaining on how inferred strategies work
 - [ ] Define Immortus.JS interface for handling successful and error responses
@@ -266,7 +266,7 @@ ROADMAP
 - [ ] Setup testing environment to work with different Ruby versions and Rails versions
 - [ ] How `Immortus.perform` and `Immortus.verify` handle if AJAX requests returns an error ( 404/500/etc )
 - [ ] ImmortusController#verify seems to be duplicating info with `completed` and `success` in the response JSON
-- [X] Use a consistent specs/tests syntax
+- [x] Use a consistent specs/tests syntax
 
 1.0
 
