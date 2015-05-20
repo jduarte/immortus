@@ -228,6 +228,8 @@ Immortus::Job.tracking_strategy = :my_custom_tracking_strategy
 # Immortus::Job.tracking_strategy = TrackingStrategy::MyCustomTrackingStrategy
 ```
 
+for more details check the [Wiki](tracking_strategies.md#custom-strategy)
+
 Development
 ---
 
