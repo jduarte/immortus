@@ -1,12 +1,12 @@
 class ImmortusController < ActionController::Base
   def verify
-    job_status = Immortus::Job.strategy_class.new.status(params[:job_id])
+    strategy = Immortus::Job.strategy_class.new
+    job_status = strategy.status(params[:job_id])
 
-    success = nil
-    success = true if job_status == :finished
+    meta = strategy.respond_to?(:meta) ? strategy.meta : {}
 
     render json: {
-      success: success,
+      meta: meta,
       completed: job_status == :finished
     }
   end

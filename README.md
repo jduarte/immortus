@@ -115,7 +115,8 @@ To create and track an async job call in your JS:
 ```javascript
 var logBeforeSend = function() { console.log('executed before AJAX request'); }
 var logAfterEnqueue = function(job_id, enqueue_successfull) { console.log('job was enqueued'); }
-var logCompleted = function(job_id, successfull) { console.log('job ' + job_id + 'was finished with ' + (successfull ? 'success' : 'error')); }
+var logCompleted = function(job_id, status, meta) { console.log('job ' + job_id + ' was finished with success'); }
+var logError = function(job_id, status, meta) { console.log('error in job ' + job_id); }
 
 Immortus.perform({
   url: '/generate_invoice',
@@ -124,7 +125,8 @@ Immortus.perform({
   },
   beforeSend: logBeforeSend,      // Defaults to empty function
   afterEnqueue: logAfterEnqueue,  // Defaults to empty function
-  completed: logCompleted         // Defaults to empty function
+  completed: logCompleted,        // Defaults to empty function
+  error: logError                 // Defaults to empty function
 });
 ```
 
@@ -137,7 +139,8 @@ Immortus.verify({
     interval: 2000,               // Defaults to 1000
   },
   setup: logBeforeSend,           // Defaults to empty function
-  completed: logCompleted         // Defaults to empty function
+  completed: logCompleted,        // Defaults to empty function
+  error: logError                 // Defaults to empty function
 });
 ```
 
@@ -151,18 +154,18 @@ By default it will infer the strategy from the ActiveJob queue adapter ( config.
 
 Here is a list of the ActiveJob queue adapter and its mapped strategies:
 
-| ActiveJob QueueAdapter |    Inferred Strategy    |                         Wiki                        |
-|-----------------------:|:-----------------------:|:---------------------------------------------------:|
-|           :delayed_job | :delayed\_job\_strategy | [How it works?](http://www.runtime-revolution.com/) |
-|            :backburner |           N/A           |                         N/A                         |
-|                    :qu |           N/A           |                         N/A                         |
-|                   :que |           N/A           |                         N/A                         |
-|         :queue_classic |           N/A           |                         N/A                         |
-|               :sidekiq |           N/A           |                         N/A                         |
-|              :sneakers |           N/A           |                         N/A                         |
-|          :sucker_punch |           N/A           |                         N/A                         |
-|                :inline |           N/A           |                         N/A                         |
-|                  :test |           N/A           |                         N/A                         |
+| ActiveJob QueueAdapter |    Inferred Strategy    |                              Wiki                             |
+|-----------------------:|:-----------------------:|:-------------------------------------------------------------:|
+|           :delayed_job | :delayed\_job\_strategy | [How it works?](tracking_strategies.md#delayed-job-strategy)  |
+|            :backburner |           N/A           |                              N/A                              |
+|                    :qu |           N/A           |                              N/A                              |
+|                   :que |           N/A           |                              N/A                              |
+|         :queue_classic |           N/A           |                              N/A                              |
+|               :sidekiq |           N/A           |                              N/A                              |
+|              :sneakers |           N/A           |                              N/A                              |
+|          :sucker_punch |           N/A           |                              N/A                              |
+|                :inline |           N/A           |                              N/A                              |
+|                  :test |           N/A           |                              N/A                              |
 
 #### Override the default strategy
 
@@ -193,13 +196,22 @@ module TrackingStrategy
     end
 
     def status(job_id)
-      # Ensure you return one of 3 poosible statuses
+      # Ensure you return one of 3 possible statuses
         # :created => Job was created but wasn't started yet
         # :started => Job was started
         # :finished => Job was finished
 
       job = find(job_id)
       job.status.to_sym
+    end
+
+    def meta(job_id)
+      job = find(job_id)
+
+      {
+        last_error: job.last_error,
+        attempts: job.attempts
+      }
     end
 
     private

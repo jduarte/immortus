@@ -21,15 +21,15 @@ module Immortus
     private
 
     def tracker_create
-      self.strategy.job_enqueued(self.job_id)
+      self.strategy.job_enqueued(self.job_id) if self.strategy.respond_to?(:job_enqueued)
     end
 
     def tracker_mark_started
-      self.strategy.job_started(self.job_id)
+      self.strategy.job_started(self.job_id) if self.strategy.respond_to?(:job_started)
     end
 
     def tracker_finish_job
-      self.strategy.job_finished(self.job_id)
+      self.strategy.job_finished(self.job_id) if self.strategy.respond_to?(:job_finished)
     end
   end
 end

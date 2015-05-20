@@ -20,7 +20,7 @@ class ImmortusControllerTest < ActionController::TestCase
       Immortus::StrategyFinder.stub(:find, empty_strategy) do
         response = get :verify, job_id: '1'
         response_json = JSON.parse(response.body)
-        assert_equal true, response_json["completed"] && response_json["success"]
+        assert_equal true, response_json["completed"]
       end
     end
   end

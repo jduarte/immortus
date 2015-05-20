@@ -49,7 +49,7 @@ class ImmortusJobTest < ActiveJob::TestCase
     assert job_finished_callback.has_been_called?
   end
 
-  test 'job finished should not be called if job execution raises an exception' do
+  test 'job finished callback should not be called if job execution raises an exception' do
     Spy.on(strategy_spy_mock, :job_started).and_call_through
     Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
     job_finished_callback = Spy.on(strategy_spy_mock, :job_finished).and_call_through

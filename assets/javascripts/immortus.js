@@ -10,15 +10,16 @@ var Immortus = (function() {
     this.url = options.url;
     this.job_id = options.job_id;
 
-    // to be used in both Immortus.perform and Immortus.verify
-    this.completed = options.completed || function() { };
-
     // to be used in Immortus.perform
     this.beforeSend = options.beforeSend || function() { };
     this.afterEnqueue = options.afterEnqueue || function() { };
 
     // to be used in Immortus.verify
     this.setup = options.setup || function() { };
+
+    // to be used in both Immortus.perform and Immortus.verify
+    this.completed = options.completed || function() { };
+    this.error = options.error || function() { };
   }
 
   Immortus.prototype.init = function() {
@@ -53,10 +54,12 @@ var Immortus = (function() {
           if(!req_success || data.completed) {
             clearInterval(that.interval);
             if (req_success) {
-              that.completed(that.job_id, data.success);
+              that.completed(that.job_id, data.status, data.meta);
             } else {
-              that.completed(that.job_id, false);
+              that.error(that.job_id, data.status, data.meta);
             }
+          } else {
+            // TODO: what should be done? change state callback? nothing?
           }
         }
       );
