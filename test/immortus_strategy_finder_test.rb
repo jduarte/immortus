@@ -8,7 +8,7 @@ class ImmortusStrategyFinderTest < ActiveJob::TestCase
                                   :strategy_class)
 
   # #fail raise Immortus::StrategyNotFound
-  def test_unknown_active_job_strategy
+  test 'unknown active job strategy' do
     ::Rails.application.config.active_job.stub(:queue_adapter, :unknown) do
       assert_raises Immortus::StrategyNotFound do
         Immortus::StrategyFinder.find
@@ -16,7 +16,7 @@ class ImmortusStrategyFinderTest < ActiveJob::TestCase
     end
   end
 
-  def test_override_unknown_strategy
+  test 'override unknown strategy' do
     Immortus::Job.stub(:tracking_strategy, :unknown) do
       assert_raises Immortus::StrategyNotFound do
         Immortus::StrategyFinder.find
@@ -30,26 +30,26 @@ class ImmortusStrategyFinderTest < ActiveJob::TestCase
   ]
 
   TestMatch.each do |s|
-    define_method("test_inferred_active_job_#{s.active_job_queue_adapter}") do
+    test "inferred active job #{s.active_job_queue_adapter}" do
       ::Rails.application.config.active_job.stub(:queue_adapter, s.active_job_queue_adapter) do
         assert_equal Immortus::StrategyFinder.find, s.strategy_class
       end
     end
 
-    define_method("test_override_immortus_job_#{s.immortus_job_tracking_strategy}") do
+    test "override immortus job #{s.immortus_job_tracking_strategy}" do
       Immortus::Job.stub(:tracking_strategy, s.immortus_job_tracking_strategy) do
         assert_equal Immortus::StrategyFinder.find, s.strategy_class
       end
     end
 
-    define_method("test_override_immortus_job_#{s.strategy_class}") do
+    test "override immortus job #{s.strategy_class}" do
       Immortus::Job.stub(:tracking_strategy, s.strategy_class) do
         assert_equal Immortus::StrategyFinder.find, s.strategy_class
       end
     end
   end
 
-  def test_custom_strategy
+  test 'custom strategy' do
     Immortus::Job.stub(:tracking_strategy, :custom_app_strategy) do
       assert_equal Immortus::StrategyFinder.find, TrackingStrategy::CustomAppStrategy
     end

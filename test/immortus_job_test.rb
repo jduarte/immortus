@@ -11,7 +11,7 @@ class ImmortusJobTest < ActiveJob::TestCase
   let(:strategy_mock) { Minitest::Mock.new }
   let(:strategy_spy_mock) { Spy.mock(Immortus::TrackingStrategy::EmptyStrategy) }
 
-  def test_job_enqueued_callback_is_called
+  test 'job enqueued callback is called' do
     strategy_mock.expect(:job_enqueued, nil, [String])
 
     WaitABitJob.stub_any_instance(:strategy, strategy_mock) do
@@ -21,7 +21,7 @@ class ImmortusJobTest < ActiveJob::TestCase
     assert strategy_mock.verify
   end
 
-  def test_job_started_callback_is_called
+  test 'job started callback is called' do
     Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
     job_started_callback = Spy.on(strategy_spy_mock, :job_started).and_call_through
     Spy.on(strategy_spy_mock, :job_finished).and_call_through
@@ -35,7 +35,7 @@ class ImmortusJobTest < ActiveJob::TestCase
     assert job_started_callback.has_been_called?
   end
 
-  def test_job_finished_callback_is_called
+  test 'job finished callback is called' do
     Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
     Spy.on(strategy_spy_mock, :job_started).and_call_through
     job_finished_callback = Spy.on(strategy_spy_mock, :job_finished).and_call_through
@@ -49,7 +49,7 @@ class ImmortusJobTest < ActiveJob::TestCase
     assert job_finished_callback.has_been_called?
   end
 
-  def test_job_finished_should_not_be_called_if_job_execution_raises_an_exception
+  test 'job finished should not be called if job execution raises an exception' do
     Spy.on(strategy_spy_mock, :job_started).and_call_through
     Spy.on(strategy_spy_mock, :job_enqueued).and_call_through
     job_finished_callback = Spy.on(strategy_spy_mock, :job_finished).and_call_through
@@ -66,7 +66,7 @@ class ImmortusJobTest < ActiveJob::TestCase
     assert !job_finished_callback.has_been_called?
   end
 
-  def test_strategy_class_should_call_StrategyFinder_find
+  test 'strategy class should call StrategyFinder find' do
     find_spy = Spy.on(Immortus::StrategyFinder, :find)
     Immortus::Job.strategy_class
     assert find_spy.has_been_called?

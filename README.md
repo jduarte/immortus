@@ -270,7 +270,7 @@ ROADMAP
 - [ ] Setup testing environment to work with different Ruby versions and Rails versions
 - [ ] How `Immortus.perform` and `Immortus.verify` handle if AJAX requests returns an error ( 404/500/etc )
 - [ ] ImmortusController#verify seems to be duplicating info with `completed` and `success` in the response JSON
-- [ ] Use a consistent specs/tests syntax
+- [X] Use a consistent specs/tests syntax
 
 1.0
 
