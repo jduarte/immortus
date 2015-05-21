@@ -71,7 +71,7 @@ class InvoicesController < ApplicationController
     #   if job.try('job_id')
     #     render json: { job_id: job.job_id }
     #   else
-    #     render json: { error: "An error occurred enqueing the job. #{job.error_exception}" }, status: 500
+    #     render json: { error: "An error occurred enqueuing the job. #{job.error_exception}" }, status: 500
     #   end
   end
 end
@@ -99,7 +99,13 @@ class GenerateInvoiceJob < Immortus::Job
 end
 ```
 
-for more details check the [Wiki](job.md)
+`Immortus::Job` is still a subclass of `ActiveJob` so you can continue to use all the code that you could've used in a regular ActiveJob class.
+
+```ruby
+GenerateInvoiceJob.new.is_a?(ActiveJob) # => true
+```
+
+for more details check the [Immortus Job section](job.md)
 
 ##### Javascript
 
@@ -115,20 +121,18 @@ Require Immortus in your manifest file ( make sure jQuery is included at this po
 To create and track an async job call in your JS:
 
 ```javascript
-var logBeforeSend = function() { console.log('executed before AJAX request'); }
-var logAfterEnqueue = function(job_id, enqueue_successfull) { console.log('job was enqueued'); }
-var logCompleted = function(job_id, status, meta) { console.log('job ' + job_id + ' was finished with success'); }
-var logError = function(job_id, status, meta) { console.log('error in job ' + job_id); }
+var logCompleted = function(data) {
+  console.log('job ' + data.job_id + ' was finished with success');
+}
+
+var logError = function(data) {
+  console.log('error in job ' + data.job_id);
+}
 
 Immortus.perform({
-  url: '/generate_invoice',
-  longpolling: {
-    interval: 2000,               // Defaults to 1000
-  },
-  beforeSend: logBeforeSend,      // Defaults to empty function
-  afterEnqueue: logAfterEnqueue,  // Defaults to empty function
-  completed: logCompleted,        // Defaults to empty function
-  error: logError                 // Defaults to empty function
+  createJobUrl: '/generate_invoice',
+  completed: logCompleted,        // Executed when a `verify job` AJAX requests returns with a 2xx status code and job is finished. Defaults to empty function
+  error: logError                 // Executed when a `verify job` AJAX requests returns with a non 2xx status code. Defaults to empty function
 });
 ```
 
@@ -137,14 +141,12 @@ To only track an existing job without creating it:
 ```javascript
 Immortus.verify({
   job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
-  longpolling: {
-    interval: 2000,               // Defaults to 1000
-  },
-  setup: logBeforeSend,           // Defaults to empty function
-  completed: logCompleted,        // Defaults to empty function
-  error: logError                 // Defaults to empty function
+  completed: logCompleted,        // Executed when a `verify job` AJAX requests returns with a 2xx status code and job is finished. Defaults to empty function
+  error: logError                 // Executed when a `verify job` AJAX requests returns with a non 2xx status code. Defaults to empty function
 });
 ```
+
+for all the options check the details in [Immortus JavaScript section](js.md)
 
 ### Tracking Strategy
 
