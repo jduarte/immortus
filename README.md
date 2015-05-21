@@ -99,6 +99,8 @@ class GenerateInvoiceJob < Immortus::Job
 end
 ```
 
+for more details check the [Wiki](job.md)
+
 ##### Javascript
 
 Require Immortus in your manifest file ( make sure jQuery is included at this point ):
@@ -276,11 +278,10 @@ ROADMAP
 - [ ] Define Immortus.JS interface for handling successful and error responses
     - [ ] `beforeSend`, `afterEnqueue`, `completed` callbacks  function arguments defenition
         - [ ] Will it be able for `completed` to have a flag `success` or not? How should this work if possible?
+- [ ] How `Immortus.perform` and `Immortus.verify` handle if AJAX requests returns an error ( 404/500/etc ) -> error(job_id, status, meta)
 - [ ] Rewrite what render_immortus(job) does under the hood in the README
-- [ ] Setup testing environment to work with different Ruby versions and Rails versions
-- [ ] How `Immortus.perform` and `Immortus.verify` handle if AJAX requests returns an error ( 404/500/etc )
-- [ ] ImmortusController#verify seems to be duplicating info with `completed` and `success` in the response JSON
 - [x] Use a consistent specs/tests syntax
+- [ ] Setup testing environment to work with different Ruby versions and Rails versions
 
 1.0
 

@@ -7,6 +7,7 @@ class ImmortusController < ActionController::Base
 
     render json: {
       meta: meta,
+      status: job_status,
       completed: job_status == :finished
     }
   end

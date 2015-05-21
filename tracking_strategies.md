@@ -45,16 +45,6 @@ callback from ActiveJob called when job is started
 
 callback from ActiveJob called when job is successfully finished
 
-### rescue_from(exception, &block)
-
-To use in case of error
-
-```ruby
-rescue_from ActiveRecord::RecordNotFound do
-  strategy.do_something_because_an_exception_raised!
-end
-```
-
 ### status(job_id)
 
 ##### :finished
