@@ -47,12 +47,12 @@ And then execute:
 # config/routes.rb
 Rails.application.routes.draw do
   immortus_jobs do
-    post "generate_invoice", :to => "invoices#generate", :as => :generate_invoice
+    post "generate_invoice", :to => "invoices#generate"
     # other routes to jobs may be added here
 
     # this will create under the hood
-      # get '/immortus/verify/:job_id', :to => 'immortus#verify_job', :as => :verify_immortus_job
-      # post '/generate_invoice', :to => 'invoices#generate', :as => :generate_invoice
+      # get '/immortus/verify/:job_id', :to => 'immortus#verify_job'
+      # post '/generate_invoice', :to => 'invoices#generate'
       # other routes to jobs
   end
 end
@@ -131,8 +131,8 @@ var jobFailed = function(data) {
 }
 
 Immortus.create('/generate_invoice')
-        .then(function({ job_id: job_id }) {
-          return Immortus.verify(job_id);
+        .then(function(job_id) {
+          return Immortus.verify({ job_id: job_id });
         })
         .then(jobFinished, jobFailed);
 ```
@@ -215,8 +215,8 @@ module TrackingStrategy
       job.update_attributes(status: 'finished')
     end
 
-    def finished?(job_id)
-      # finished method is mandatory, should return a boolean ( true if job finished, false otherwise )
+    def completed?(job_id)
+      # completed? method is mandatory, should return a boolean ( true if job is finished, false otherwise )
       job = find(job_id)
       job.status == 'finished'
     end
@@ -245,7 +245,7 @@ Immortus::Job.tracking_strategy = :my_custom_tracking_strategy
 # Immortus::Job.tracking_strategy = TrackingStrategy::MyCustomTrackingStrategy
 ```
 
-for more details check the [Wiki](tracking_strategies.md#custom-strategy)
+for more details check the [Custom Tracking Strategies section](tracking_strategies.md#custom-strategy)
 
 You can use Immortus in almost any case
 ---
@@ -285,12 +285,12 @@ module TrackingStrategy
 
     def job_enqueued(job_id)
       # Save in a custom table that this job was created
-      BigBackgroundJobTable.create!(job_id: job_id, status: 'unfinished', percentage: nil)
+      BigBackgroundJobTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
     end
 
     def job_started(job_id)
       job = find(job_id)
-      job.update_attributes(percentage: 0)
+      job.update_attributes(status: 'running')
     end
 
     def job_finished(job_id)
@@ -303,7 +303,7 @@ module TrackingStrategy
       job.update_attributes(percentage: percentage)
     end
 
-    def finished?(job_id)
+    def completed?(job_id)
       job = find(job_id)
       job.status == 'finished'
     end
