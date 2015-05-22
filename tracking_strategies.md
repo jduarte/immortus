@@ -35,29 +35,33 @@ Since Delayed::Job already persist data we don't need none of the callbacks, we 
 
 ### job_enqueued(job_id)
 
+optional method.
+
 callback from ActiveJob called when job is enqueued ( usually used to persist job data )
 
 ### job_started(job_id)
+
+optional method.
 
 callback from ActiveJob called when job is started
 
 ### job_finished(job_id)
 
+optional method.
+
 callback from ActiveJob called when job is successfully finished
 
-### status(job_id)
+### completed?(job_id)
 
-##### :finished
+mandatory method.
 
-should be returned if job run with success
+should return a boolean ( true if job is finished, false otherwise )
 
-##### :started
+### meta(job_id)
 
-should be returned if job already run at least once
+optional method.
 
-##### :created
-
-should be returned if job never run (in queue)
+returned hash will be added in every verify request
 
 ### find(job_id)
 
