@@ -132,7 +132,7 @@ var jobFailed = function(data) {
 
 Immortus.create('/create_job')
   .then(function(job_id) {
-    return Immortus.verify('/verify_job/' + job_id);
+    return Immortus.verify(job_id);
   })
     .then(jobFinished, jobFailed);
 ```
@@ -140,7 +140,7 @@ Immortus.create('/create_job')
 To only track an existing job without creating it:
 
 ```javascript
-Immortus.verify('/verify_job/908ec6f1-e093-4943-b7a8-7c84eccfe417')
+Immortus.verify('908ec6f1-e093-4943-b7a8-7c84eccfe417')
   .then(jobFinished, jobFailed);
 ```
 
@@ -371,7 +371,7 @@ var jobInProgress = function(data) {
 Immortus.create('/create_job')
   .then(jobCreatedSuccessfully, jobFailedToCreate)
   .then(function(job_id) {
-    return Immortus.verify('/verify_job/' + job_id + '/big_background_job', { longPolling: 5000 });
+    return Immortus.verify(job_id + '/big_background_job', { longPolling: 5000 });
   })
     .then(jobFinished, jobFailed, jobInProgress);
 ```
@@ -379,7 +379,7 @@ Immortus.create('/create_job')
 To only track an existing job without creating it:
 
 ```javascript
-Immortus.verify('/verify_job/908ec6f1-e093-4943-b7a8-7c84eccfe417/big_background_job', { longPolling: 5000 })
+Immortus.verify('908ec6f1-e093-4943-b7a8-7c84eccfe417/big_background_job', { longPolling: 5000 })
   .then(jobFinished, jobFailed, jobInProgress);
 ```
 
