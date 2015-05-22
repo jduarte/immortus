@@ -121,30 +121,30 @@ Require Immortus in your manifest file ( make sure jQuery is included at this po
 To create and track an async job call in your JS:
 
 ```javascript
-var logCompleted = function(data) {
-  console.log('job ' + data.job_id + ' was finished with success');
+var jobFinished = function(data) {
+  // Job was completed here. `data` has the info returned in the `GenerateInvoicesController#verify`
+  console.log(data.job_id ' finished successfully.');
 }
 
-var logError = function(data) {
+var jobFailed = function(data) {
   console.log('error in job ' + data.job_id);
 }
 
-Immortus.perform({
-  createJobUrl: '/generate_invoice',
-  completed: logCompleted,        // Executed when a `verify job` AJAX requests returns with a 2xx status code and job is finished. Defaults to empty function
-  error: logError                 // Executed when a `verify job` AJAX requests returns with a non 2xx status code. Defaults to empty function
-});
+Immortus.create('/create_job')
+  .then(function(job_id) {
+    return Immortus.verify('/verify_job/' + job_id);
+  })
+    .then(jobFinished, jobFailed);
 ```
 
 To only track an existing job without creating it:
 
 ```javascript
-Immortus.verify({
-  job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
-  completed: logCompleted,        // Executed when a `verify job` AJAX requests returns with a 2xx status code and job is finished. Defaults to empty function
-  error: logError                 // Executed when a `verify job` AJAX requests returns with a non 2xx status code. Defaults to empty function
-});
+Immortus.verify('/verify_job/908ec6f1-e093-4943-b7a8-7c84eccfe417')
+  .then(jobFinished, jobFailed);
 ```
+
+We use jQuery Promises (we can use .done or .fail instead of .then) for more details check [jQuery api](http://api.jquery.com/category/deferred-object/)
 
 for all the options check the details in [Immortus JavaScript section](js.md)
 
@@ -300,6 +300,13 @@ module TrackingStrategy
       job.status == 'finished'
     end
 
+    def meta(job_id)
+      # if meta method is defined, the returned hash will be added in every verify request
+      {
+        percentage: percentage(job_id)
+      }
+    end
+
     private
 
     def find(job_id)
@@ -308,27 +315,15 @@ module TrackingStrategy
 
   end
 end
-
-# config/initializer/immortus.rb
-Immortus::Job.tracking_strategy = :big_background_job_strategy
 ```
 
-##### Switch Job parent class from `ActiveJob` to `Immortus::Job`
-
-```ruby
-# app/jobs/big_background_job.rb
-class BigBackgroundJob < ActiveJob
-  def perform(record)
-    # do some heavy processing ...
-  end
-end
-```
-
-to
+##### create `Immortus::Job` with our custom strategy
 
 ```ruby
 # app/jobs/big_background_job.rb
 class BigBackgroundJob < Immortus::Job
+  tracking_strategy :big_background_job_strategy
+
   def perform(record)
     # do some heavy processing ...
     # update job percentage by using:
@@ -351,54 +346,41 @@ Require Immortus in your manifest file ( make sure jQuery is included at this po
 To create and track an async job call in your JS:
 
 ```javascript
-var logBeforeSend = function() {
-  console.log('executed before AJAX request');
+var jobCreatedSuccessfully = function(data) {
+  // logic to add some loading gif
+
+  return data.job_id;
 }
 
-var logAfterEnqueue = function(data, enqueue_successfull) {
-  console.log('job ' + data.job_id + ' was enqueued with ' + (enqueue_successfull ? 'success' : 'error'));
-}
-
-var updatePercentage = function(data) {
-  // logic to update percentage with `data.percentage` ...
+var jobFailedToCreate = function() {
+  alert('Job failed to create');
 }
 
 var jobFinished = function(data) {
   // logic to finish ...
 }
 
-var handleError = function(data) {
-  // logic to handle error ...
+var jobFailed = function(data) {
+  alert('Job ' + data.job_id + ' failed to perform');
 }
 
-Immortus.perform({
-  createJobUrl: '/generate_big_background_job',
-  jobClass: 'big_background_job',
-  longpolling: {
-    interval: 2000,
-  },
-  beforeSend: logBeforeSend,
-  afterEnqueue: logAfterEnqueue,
-  verify_tick: updatePercentage,
-  completed: jobFinished,
-  error: handleError
-});
+var jobInProgress = function(data) {
+  // logic to update percentage with `data.percentage` ...
+}
+
+Immortus.create('/create_job')
+  .then(jobCreatedSuccessfully, jobFailedToCreate)
+  .then(function(job_id) {
+    return Immortus.verify('/verify_job/' + job_id + '/big_background_job', { longPolling: 5000 });
+  })
+    .then(jobFinished, jobFailed, jobInProgress);
 ```
 
 To only track an existing job without creating it:
 
 ```javascript
-Immortus.verify({
-  jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
-  jobClass: 'big_background_job',
-  longpolling: {
-    interval: 2000,
-  },
-  beforeSend: logBeforeSend,
-  verify_tick: updatePercentage,
-  completed: jobFinished,
-  error: handleError
-});
+Immortus.verify('/verify_job/908ec6f1-e093-4943-b7a8-7c84eccfe417/big_background_job', { longPolling: 5000 })
+  .then(jobFinished, jobFailed, jobInProgress);
 ```
 
 Development
