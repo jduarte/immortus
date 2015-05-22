@@ -131,7 +131,7 @@ var jobFailed = function(data) {
 }
 
 Immortus.create('/generate_invoice')
-        .then(function(job_id) {
+        .then(function({ job_id: job_id }) {
           return Immortus.verify(job_id);
         })
         .then(jobFinished, jobFailed);
@@ -140,17 +140,19 @@ Immortus.create('/generate_invoice')
 To only track an existing job without creating it:
 
 ```javascript
-Immortus.verify('908ec6f1-e093-4943-b7a8-7c84eccfe417')
+Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417' })
         .then(jobFinished, jobFailed);
 ```
 
-We use jQuery Promises (we can use .done or .fail instead of .then) for more details check [jQuery api](http://api.jquery.com/category/deferred-object/)
+We use jQuery Promises (we can use .done or .fail instead of .then) for more details check [jQuery deferred API](http://api.jquery.com/category/deferred-object/)
 
 for all the options check the details in [Immortus JavaScript section](js.md)
 
 ### Tracking Strategy
 
-Immortus will use a strategy to keep track of the job status
+Immortus will use a strategy to keep track of the job status.
+
+Tracking strategy order is perJob/Immortus::Job config/ActiveJob QueueAdapter infer
 
 #### Inferred from ActiveJob queue adapter
 
@@ -220,7 +222,7 @@ module TrackingStrategy
     end
 
     def meta(job_id)
-      # if meta method is defined, the returned hash will be added in every verify request
+      # if meta method is defined, the returned hash will be added in every verify request (job_id is always sent)
       job = find(job_id)
 
       {
@@ -239,7 +241,7 @@ end
 
 # config/initializer/immortus.rb
 Immortus::Job.tracking_strategy = :my_custom_tracking_strategy
-# you could also specify the class, it's mandatory if namespaced, like:
+# you could also specify the class directly:
 # Immortus::Job.tracking_strategy = TrackingStrategy::MyCustomTrackingStrategy
 ```
 
@@ -369,7 +371,7 @@ var jobInProgress = function(data) {
 Immortus.create('/generate_big_background_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(job_id) {
-          return Immortus.verify({ job_id }, { longPolling: { interval: 5000 } });
+          return Immortus.verify({ job_id: job_id }, { longPolling: { interval: 5000 } });
         })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
@@ -377,7 +379,7 @@ Immortus.create('/generate_big_background_job')
 To only track an existing job without creating it:
 
 ```javascript
-Immortus.verify({ '908ec6f1-e093-4943-b7a8-7c84eccfe417', 'big_background_job' }, { longPolling: { interval: 5000 } })
+Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'big_background_job' }, { longPolling: { interval: 5000 } })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
 

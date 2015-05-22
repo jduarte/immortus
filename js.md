@@ -1,8 +1,10 @@
 JavaScript
 ===
 
-Requirements
+Require Immortus JS
 ---
+
+Require Immortus in your manifest file ( make sure jQuery is included at this point ):
 
 ```javascript
 // in your main js file: usually assets/javascript/application.js
@@ -14,44 +16,48 @@ Requirements
 ### To create and track an async job call in your JS:
 
 ```javascript
-var logBeforeSend = function() {
-  console.log('executed before AJAX request');
+var jobCreatedSuccessfully = function(data) {
+  // Executed when `create job` AJAX request returns with a 2xx status code
+  console.log('Job ' + data.job_id + ' created successfully');
+
+  // We must return here the `job_id` in order for the `verify` function receive this argument.
+  return data.job_id;
 }
 
-var logAfterEnqueue = function(data, enqueue_successfull) {
-  console.log('job ' + data.job_id + ' was enqueued with ' + (enqueue_successfull ? 'success' : 'error'));
+var jobFailedToCreate = function() {
+  // Executed when `create job` AJAX request returns with a non 2xx status code
+  console.log('Job failed to create');
 }
 
-var logCompleted = function(data) {
-  console.log('job ' + data.job_id + ' was finished with success');
+var jobFinished = function(data) {
+  // Executed when a job is finished
+  console.log('Job ' + data.job_id + 'finished successfully');
 }
 
-var logError = function(data) {
-  console.log('error in job ' + data.job_id);
+var jobFailed = function(data) {
+  // Executed when a `verify job` AJAX requests returns with a non 2xx status code
+  console.log('Job ' + data.job_id + ' failed to perform');
 }
 
-Immortus.perform({
-  createJobUrl: '/generate_invoice',
-  longpolling: {
-    interval: 2000,               // Defaults to 1000
-  },
-  beforeSend: logBeforeSend,      // Executed before the `create job` AJAX request. Defaults to empty function
-  afterEnqueue: logAfterEnqueue,  // Executed after the `create job` AJAX request. Defaults to empty function
-  completed: logCompleted,        // Executed when a `verify job` AJAX requests returns with a 2xx status code and job is finished. Defaults to empty function
-  error: logError                 // Executed when a `verify job` AJAX requests returns with a non 2xx status code. Defaults to empty function
-});
+var jobInProgress = function(data) {
+  // Executed every `verify job` AJAX request (each `longPolling` milliseconds, defaults to 1000)
+  console.log('Job is still executing ...');
+}
+
+Immortus.create('/create_job')
+        .then(jobCreatedSuccessfully, jobFailedToCreate)
+        .then(function(job_id) {
+          return Immortus.verify('/verify_job/' + job_id, { longPolling: { interval: 5000 } });
+        })
+        .then(jobFinished, jobFailed, jobInProgress);
 ```
 
 ### To only track an existing job without creating it:
 
 ```javascript
-Immortus.verify({
-  job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
-  longpolling: {
-    interval: 2000,               // Defaults to 1000
-  },
-  beforeSend: logBeforeSend,      // Executed before the first `verify job` AJAX request. Defaults to empty function
-  completed: logCompleted,        // Executed when a `verify job` AJAX requests returns with a 2xx status code and job is finished. Defaults to empty function
-  error: logError                 // Executed when a `verify job` AJAX requests returns with a non 2xx status code. Defaults to empty function
+// You can also use only the `verify` callback to verify only without creating the job.
+// In this case we need to pass the `job_id` directly because it will not be received from the `jobCreatedSuccessfully` callback
+Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', jobClass: 'job_class' }, { longPolling: { interval: 5000 } })
+        .then(jobFinished, jobFailed, jobInProgress);
 });
 ```
