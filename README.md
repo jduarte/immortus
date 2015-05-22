@@ -177,6 +177,20 @@ Here is a list of the ActiveJob queue adapter and its mapped strategies:
 # config/initializer/immortus.rb
 Immortus::Job.tracking_strategy = :redis_pub_sub_strategy
 ```
+#### Define the tracking strategy per job
+
+By default all `Immortus::Job` subclasses will inherit the default tracking strategy but you can define it in a per job basis
+
+```ruby
+# app/jobs/generate_invoice_job.rb
+class GenerateInvoiceJob < Immortus::Job
+  tracking_strategy :redis_pub_sub_strategy
+
+  def perform(record)
+    # Generate invoices ...
+  end
+end
+```
 
 #### Define your own tracking strategy
 
