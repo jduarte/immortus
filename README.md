@@ -290,20 +290,18 @@ module TrackingStrategy
       job.update_attributes(percentage: percentage)
     end
 
-    def percentage(job_id)
-      job = find(job_id)
-      job.percentage
-    end
-
-    def completed?(job_id)
+    def finished?(job_id)
+      # finished method is mandatory, should return a boolean ( true if job finished, false otherwise )
       job = find(job_id)
       job.status == 'finished'
     end
 
     def meta(job_id)
       # if meta method is defined, the returned hash will be added in every verify request
+      job = find(job_id)
+
       {
-        percentage: percentage(job_id)
+        percentage: job.percentage
       }
     end
 
