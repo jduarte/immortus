@@ -341,15 +341,6 @@ end
 
 ##### Javascript
 
-Require Immortus in your manifest file ( make sure jQuery is included at this point ):
-
-```javascript
-// in your main js file: usually assets/javascript/application.js
-
-//= ...
-//= require immortus
-```
-
 To create and track an async job call in your JS:
 
 ```javascript
