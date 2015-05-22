@@ -131,17 +131,17 @@ var jobFailed = function(data) {
 }
 
 Immortus.create('/create_job')
-  .then(function(job_id) {
-    return Immortus.verify(job_id);
-  })
-    .then(jobFinished, jobFailed);
+        .then(function(job_id) {
+          return Immortus.verify(job_id);
+        })
+        .then(jobFinished, jobFailed);
 ```
 
 To only track an existing job without creating it:
 
 ```javascript
 Immortus.verify('908ec6f1-e093-4943-b7a8-7c84eccfe417')
-  .then(jobFinished, jobFailed);
+        .then(jobFinished, jobFailed);
 ```
 
 We use jQuery Promises (we can use .done or .fail instead of .then) for more details check [jQuery api](http://api.jquery.com/category/deferred-object/)
@@ -367,18 +367,18 @@ var jobInProgress = function(data) {
 }
 
 Immortus.create('/create_job')
-  .then(jobCreatedSuccessfully, jobFailedToCreate)
-  .then(function(job_id) {
-    return Immortus.verify(job_id + '/big_background_job', { longPolling: 5000 });
-  })
-    .then(jobFinished, jobFailed, jobInProgress);
+        .then(jobCreatedSuccessfully, jobFailedToCreate)
+        .then(function(job_id) {
+          return Immortus.verify(job_id + '/big_background_job', { longPolling: 5000 });
+        })
+        .then(jobFinished, jobFailed, jobInProgress);
 ```
 
 To only track an existing job without creating it:
 
 ```javascript
 Immortus.verify('908ec6f1-e093-4943-b7a8-7c84eccfe417/big_background_job', { longPolling: 5000 })
-  .then(jobFinished, jobFailed, jobInProgress);
+        .then(jobFinished, jobFailed, jobInProgress);
 ```
 
 Development
