@@ -69,7 +69,7 @@ class InvoicesController < ApplicationController
 
     # this will create under the hood
     #   if job.try('job_id')
-    #     render json: { job_id: job.job_id }
+    #     render json: { job_id: job.job_id, job_class: job.class }
     #   else
     #     render json: { error: "An error occurred enqueuing the job. #{job.error_exception}" }, status: 500
     #   end
@@ -222,7 +222,7 @@ module TrackingStrategy
     end
 
     def meta(job_id)
-      # if meta method is defined, the returned hash will be added in every verify request (job_id is always sent)
+      # if meta method is defined, the returned hash will be added in every verify request
       job = find(job_id)
 
       {
@@ -379,6 +379,7 @@ Immortus.create('/generate_big_background_job')
 To only track an existing job without creating it:
 
 ```javascript
+// render_immortus returns the job_class. in this case since we don't use the create job we need to pass the jobClass manually
 Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'big_background_job' }, { longPolling: { interval: 5000 } })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
