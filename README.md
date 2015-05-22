@@ -234,6 +234,173 @@ Immortus::Job.tracking_strategy = :my_custom_tracking_strategy
 
 for more details check the [Wiki](tracking_strategies.md#custom-strategy)
 
+You can use Immortus in almost any case
+---
+
+let's use it to update a percentage of a big background job
+
+##### Create job routes
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  # ...
+
+  immortus_jobs do
+    post "generate_big_background_job", :to => "big_background_job#generate"
+  end
+end
+```
+
+##### Controller
+
+```ruby
+# app/controllers/big_background_job_controller.rb
+class BigBackgroundJobController < ApplicationController
+  def generate
+    job = BigBackgroundJob.perform_later
+
+    render_immortus job
+  end
+end
+```
+
+```ruby
+# app/jobs/tracking_strategy/big_background_job_strategy.rb
+module TrackingStrategy
+  class BigBackgroundJobStrategy
+
+    def job_enqueued(job_id)
+      # Save in a custom table that this job was created
+      BigBackgroundJobTable.create!(job_id: job_id, status: 'unfinished', percentage: nil)
+    end
+
+    def job_started(job_id)
+      job = find(job_id)
+      job.update_attributes(percentage: 0)
+    end
+
+    def job_finished(job_id)
+      job = find(job_id)
+      job.update_attributes(status: 'finished', percentage: 100)
+    end
+
+    def update_percentage(job_id, percentage)
+      job = find(job_id)
+      job.update_attributes(percentage: percentage)
+    end
+
+    def percentage(job_id)
+      job = find(job_id)
+      job.percentage
+    end
+
+    def completed?(job_id)
+      job = find(job_id)
+      job.status == 'finished'
+    end
+
+    private
+
+    def find(job_id)
+      BigBackgroundJobTable.find_by(job_id: job_id)
+    end
+
+  end
+end
+
+# config/initializer/immortus.rb
+Immortus::Job.tracking_strategy = :big_background_job_strategy
+```
+
+##### Switch Job parent class from `ActiveJob` to `Immortus::Job`
+
+```ruby
+# app/jobs/big_background_job.rb
+class BigBackgroundJob < ActiveJob
+  def perform(record)
+    # do some heavy processing ...
+  end
+end
+```
+
+to
+
+```ruby
+# app/jobs/big_background_job.rb
+class BigBackgroundJob < Immortus::Job
+  def perform(record)
+    # do some heavy processing ...
+    # update job percentage by using:
+    #   self.strategy.update_percentage(job_id, percentage)
+  end
+end
+```
+
+##### Javascript
+
+Require Immortus in your manifest file ( make sure jQuery is included at this point ):
+
+```javascript
+// in your main js file: usually assets/javascript/application.js
+
+//= ...
+//= require immortus
+```
+
+To create and track an async job call in your JS:
+
+```javascript
+var logBeforeSend = function() {
+  console.log('executed before AJAX request');
+}
+
+var logAfterEnqueue = function(data, enqueue_successfull) {
+  console.log('job ' + data.job_id + ' was enqueued with ' + (enqueue_successfull ? 'success' : 'error'));
+}
+
+var updatePercentage = function(data) {
+  // logic to update percentage with `data.percentage` ...
+}
+
+var jobFinished = function(data) {
+  // logic to finish ...
+}
+
+var handleError = function(data) {
+  // logic to handle error ...
+}
+
+Immortus.perform({
+  createJobUrl: '/generate_big_background_job',
+  jobClass: 'big_background_job',
+  longpolling: {
+    interval: 2000,
+  },
+  beforeSend: logBeforeSend,
+  afterEnqueue: logAfterEnqueue,
+  verify_tick: updatePercentage,
+  completed: jobFinished,
+  error: handleError
+});
+```
+
+To only track an existing job without creating it:
+
+```javascript
+Immortus.verify({
+  jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
+  jobClass: 'big_background_job',
+  longpolling: {
+    interval: 2000,
+  },
+  beforeSend: logBeforeSend,
+  verify_tick: updatePercentage,
+  completed: jobFinished,
+  error: handleError
+});
+```
+
 Development
 ---
 

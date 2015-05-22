@@ -50,7 +50,7 @@ Immortus.verify({
   longpolling: {
     interval: 2000,               // Defaults to 1000
   },
-  beforeSend: logBeforeSend,           // Executed before the first `verify job` AJAX request. Defaults to empty function
+  beforeSend: logBeforeSend,      // Executed before the first `verify job` AJAX request. Defaults to empty function
   completed: logCompleted,        // Executed when a `verify job` AJAX requests returns with a 2xx status code and job is finished. Defaults to empty function
   error: logError                 // Executed when a `verify job` AJAX requests returns with a non 2xx status code. Defaults to empty function
 });
