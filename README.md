@@ -213,17 +213,14 @@ module TrackingStrategy
       job.update_attributes(status: 'finished')
     end
 
-    def status(job_id)
-      # Ensure you return one of 3 possible statuses
-        # :created => Job was created but wasn't started yet
-        # :started => Job was started
-        # :finished => Job was finished
-
+    def finished?(job_id)
+      # finished method is mandatory, should return a boolean ( true if job finished, false otherwise )
       job = find(job_id)
-      job.status.to_sym
+      job.status == 'finished'
     end
 
     def meta(job_id)
+      # if meta method is defined, the returned hash will be added in every verify request
       job = find(job_id)
 
       {
@@ -305,13 +302,11 @@ module TrackingStrategy
     end
 
     def finished?(job_id)
-      # finished method is mandatory, should return a boolean ( true if job finished, false otherwise )
       job = find(job_id)
       job.status == 'finished'
     end
 
     def meta(job_id)
-      # if meta method is defined, the returned hash will be added in every verify request
       job = find(job_id)
 
       {
