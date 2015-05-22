@@ -130,7 +130,7 @@ var jobFailed = function(data) {
   console.log('error in job ' + data.job_id);
 }
 
-Immortus.create('/create_job')
+Immortus.create('/generate_invoice')
         .then(function(job_id) {
           return Immortus.verify(job_id);
         })
@@ -366,10 +366,10 @@ var jobInProgress = function(data) {
   // logic to update percentage with `data.percentage` ...
 }
 
-Immortus.create('/create_job')
+Immortus.create('/generate_big_background_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(job_id) {
-          return Immortus.verify(job_id + '/big_background_job', { longPolling: 5000 });
+          return Immortus.verify({ job_id }, { longPolling: { interval: 5000 } });
         })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
@@ -377,7 +377,7 @@ Immortus.create('/create_job')
 To only track an existing job without creating it:
 
 ```javascript
-Immortus.verify('908ec6f1-e093-4943-b7a8-7c84eccfe417/big_background_job', { longPolling: 5000 })
+Immortus.verify({ '908ec6f1-e093-4943-b7a8-7c84eccfe417', 'big_background_job' }, { longPolling: { interval: 5000 } })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
 
