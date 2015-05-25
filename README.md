@@ -51,7 +51,7 @@ Rails.application.routes.draw do
     # other routes to jobs may be added here
 
     # `immortus_jobs` will create under the hood
-    #   get '/immortus/verify/:job_id', :to => 'immortus#verify_job'
+    #   get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify'
     #   post '/generate_invoice', :to => 'invoices#generate'
     #   other routes to jobs
   end
@@ -499,17 +499,15 @@ ROADMAP
     - [x] ImmortusController#verify
         - [x] Tracking Strategies
             - [x] Delayed Job ( AR )
-- [ ] Define Immortus::Job Strategy interface and expected return values
-    - [ ] Wiki explaining on how inferred strategies work
-- [ ] Define Immortus.JS interface for handling successful and error responses
-    - [ ] `beforeSend`, `afterEnqueue`, `completed` callbacks  function arguments defenition
-        - [ ] Will it be able for `completed` to have a flag `success` or not? How should this work if possible?
-- [ ] How `Immortus.perform` and `Immortus.verify` handle if AJAX requests returns an error ( 404/500/etc ) -> error(job_id, status, meta)
+- [x] Define Immortus::Job Strategy interface and expected return values
+    - [x] Wiki explaining on how inferred strategies work
+- [x] Define Immortus.JS interface for handling successful and error responses
 - [ ] Rewrite what render_immortus(job) does under the hood in the README
-- [x] Use a consistent specs/tests syntax
+    - [ ] should return error message?
 - [ ] Setup testing environment to work with different Ruby versions and Rails versions
 - [ ] Ensure JS callbacks `data` is available
-- [ ] Ensure gem tracking strategies have a public `completed?` method
+- [x] Ensure gem tracking strategies have a public `completed?` method
+- [ ] consider using a custom JS class (ImmortusJob?)
 
 Soon
 

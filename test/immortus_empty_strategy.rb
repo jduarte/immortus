@@ -14,7 +14,11 @@ module Immortus
       def find(job_id)
       end
 
-      def status(job_id)
+      def completed?(job_id)
+      end
+
+      def meta(job_id)
+        {}
       end
 
     end

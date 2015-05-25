@@ -10,24 +10,28 @@ class ImmortusDelayedJobActiveRecordSstrategyTest < ActiveSupport::TestCase
   let(:pending_job) { Delayed::Job.create(handler: "--- !ruby/object:ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper\njob_data:\n  job_class: WaitABitJob\n  job_id: #{pending_job_id}\n  queue_name: default\n  arguments: []") }
   let(:processing_job_id) { SecureRandom.uuid }
   let(:processing_job) { Delayed::Job.create(handler: "--- !ruby/object:ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper\njob_data:\n  job_class: WaitABitJob\n  job_id: #{processing_job_id}\n  queue_name: default\n  arguments: []", locked_at: Date.today, locked_by: 'someone') }
-  let(:failed_job_id) { SecureRandom.uuid }
-  let(:failed_job) { Delayed::Job.create(handler: "--- !ruby/object:ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper\njob_data:\n  job_class: WaitABitJob\n  job_id: #{failed_job_id}\n  queue_name: default\n  arguments: []", attempts: 1, last_error: 'some error description') }
+  # let(:failed_job_id) { SecureRandom.uuid }
+  # let(:failed_job) { Delayed::Job.create(handler: "--- !ruby/object:ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper\njob_data:\n  job_class: WaitABitJob\n  job_id: #{failed_job_id}\n  queue_name: default\n  arguments: []", attempts: 1, last_error: 'some error description') }
   let(:job_id) { SecureRandom.uuid }
 
-  test 'status finished if invalid job that never ran' do
+  test 'unknown job is finished' do
     # we have no way to tell if that job ever existed or not
     # since the job is deleted from the DB when it finished successfully
     # so we return :finished if the record does not exist in the DB
-    assert_equal :finished, delayed_job_strategy.status(job_id)
+    assert_equal true, delayed_job_strategy.completed?(job_id)
   end
 
-  test 'status started' do
+  test 'processed job is not finished' do
     processing_job
-    assert_equal :started, delayed_job_strategy.status(processing_job_id)
+    assert_equal false, delayed_job_strategy.completed?(processing_job_id)
   end
 
-  test 'status created' do
+  test 'pending job is not finished' do
     pending_job
-    assert_equal :created, delayed_job_strategy.status(pending_job_id)
+    assert_equal false, delayed_job_strategy.completed?(pending_job_id)
+  end
+
+  test 'strategy has completed method' do
+    assert_equal true, delayed_job_strategy.respond_to?('completed?')
   end
 end

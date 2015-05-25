@@ -1,15 +1,11 @@
 module Immortus
   module TrackingStrategy
     class DelayedJobActiveRecordStrategy
-      def status(job_id)
+
+      def completed?(job_id)
         job = find(job_id)
 
-        # Whenever a job is finished DelayedJob will delete that record from the DB
-        return :finished if !job
-
-        # If a job has started perform or has previous attempts it will return :started
-        return :started if job.locked_at || job.attempts > 0
-        return :created
+        return !job
       end
 
       private

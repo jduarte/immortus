@@ -1,6 +1,13 @@
 Tracking Strategies
 ===
 
+How it works
+---
+
+Each job has a strategy that is responsible to track it.
+
+To find which strategy should be used to track a specific job first it will see if specified job has a in-line definition `tracking_strategy :my_custom_tracking_strategy` if not it will try to find if a global configuration `mmortus::Job.tracking_strategy = :my_custom_tracking_strategy` in `config/initializer/immortus.rb` if not it will infer from ActiveJob (default)
+
 Delayed::Job Strategy
 ---
 
@@ -31,40 +38,45 @@ Since Delayed::Job already persist data we don't need none of the callbacks, we 
 Custom Strategy
 ---
 
-Since Delayed::Job already persist data we don't need none of the callbacks, we just need to define status and find
+There are two ways to use a custom strategy:
 
-### job_enqueued(job_id)
+- with the default verify controller
+    - completed?(job_id) is mandatory
+    - meta(job_id) is used to send extra data to JS
+- with custom verify controller
+    - no mandatory methods
+    - custom controller method specifies what should be sent to JS
 
-optional method.
+### default verify controller methods
 
-callback from ActiveJob called when job is enqueued ( usually used to persist job data )
+##### completed?(job_id)
 
-### job_started(job_id)
-
-optional method.
-
-callback from ActiveJob called when job is started
-
-### job_finished(job_id)
-
-optional method.
-
-callback from ActiveJob called when job is successfully finished
-
-### completed?(job_id)
-
-mandatory method if using default verify controller.
+This is a mandatory method if using default verify controller.
 
 should return a boolean ( true if job is finished, false otherwise )
 
-### meta(job_id)
+##### meta(job_id)
 
-optional method.
+This is a optional method.
 
 returned hash will be added in every verify request
 
-### find(job_id)
+### callbacks
 
-this is a private method.
+##### job_enqueued(job_id)
 
-should return a row or object with job info
+This is a optional method, recommended to use in custom strategies to persist job data.
+
+callback from ActiveJob called when job is enqueued
+
+##### job_started(job_id)
+
+This is a optional method.
+
+callback from ActiveJob called when job is started (is out of the queue, being processed)
+
+##### job_finished(job_id)
+
+This is a optional method, recommended to use in custom strategies to mark job as finished.
+
+callback from ActiveJob called when job is successfully finished

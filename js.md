@@ -19,6 +19,7 @@ var jobCreatedSuccessfully = function(data) {
   console.log('Job ' + data.job_id + ' created successfully');
 
   // We must return here the `job_id` in order for the `verify` function receive this argument.
+  // We also must return the `job_class` if using more then 1 strategy in application.
   return { jobId: data.job_id, jobClass: data.job_class };
 }
 

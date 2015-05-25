@@ -15,8 +15,8 @@ class ImmortusControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'finished status' do
-    empty_strategy.stub_any_instance(:status, :finished) do
+  test 'completed with success' do
+    empty_strategy.stub_any_instance(:completed?, true) do
       Immortus::StrategyFinder.stub(:find, empty_strategy) do
         response = get :verify, job_id: '1'
         response_json = JSON.parse(response.body)
@@ -25,8 +25,8 @@ class ImmortusControllerTest < ActionController::TestCase
     end
   end
 
-  test 'started status' do
-    empty_strategy.stub_any_instance(:status, :started) do
+  test 'not completed' do
+    empty_strategy.stub_any_instance(:completed?, false) do
       Immortus::StrategyFinder.stub(:find, empty_strategy) do
         response = get :verify, job_id: '1'
         response_json = JSON.parse(response.body)
@@ -35,13 +35,11 @@ class ImmortusControllerTest < ActionController::TestCase
     end
   end
 
-  test 'created status' do
-    empty_strategy.stub_any_instance(:status, :created) do
-      Immortus::StrategyFinder.stub(:find, empty_strategy) do
-        response = get :verify, job_id: '1'
-        response_json = JSON.parse(response.body)
-        assert_equal true, !response_json["completed"]
-      end
+  test 'job_id is present in response' do
+    Immortus::StrategyFinder.stub(:find, empty_strategy) do
+      response = get :verify, job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417'
+      response_json = JSON.parse(response.body)
+      assert_equal '908ec6f1-e093-4943-b7a8-7c84eccfe417', response_json["job_id"]
     end
   end
 end
