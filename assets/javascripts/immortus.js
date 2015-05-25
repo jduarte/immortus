@@ -1,80 +1,44 @@
 var Immortus = (function() {
   var api = {};
 
-  function Immortus(options) {
-    // TODO: Sanitize and normalize options
-    this.options = options;
+  api.create = function(url) {
+    return $.post(url, null, null, 'json');
+  };
 
-    this.interval = undefined;
-    this.interval_milliseconds = options.longpolling.interval;
-    this.url = options.url;
-    this.job_id = options.job_id;
+  api.verify = function(jobOptions, options) {
+    var defer = $.Deferred();
+    var url = jobOptions.verifyJobUrl;
+    var default_return = { job_id: jobOptions.jobId };
+    var timeout = (options.longPolling && options.longPolling.interval) || 500
 
-    // to be used in Immortus.perform
-    this.beforeSend = options.beforeSend || function() { };
-    this.afterEnqueue = options.afterEnqueue || function() { };
+    if(!url) {
+      url = '/immortus/verify/' + jobOptions.jobId;
 
-    // to be used in Immortus.verify
-    this.setup = options.setup || function() { };
-
-    // to be used in both Immortus.perform and Immortus.verify
-    this.completed = options.completed || function() { };
-    this.error = options.error || function() { };
-  }
-
-  Immortus.prototype.init = function() {
-    var that = this;
-
-    this.beforeSend();
-    $.ajax({
-      url: this.url,
-      dataType: 'json'
-    }).always(
-      function(data, textStatus, jqXHR) {
-        that.job_id = data.job_id;
-        var success = textStatus === 'success';
-        that.afterEnqueue(data.job_id, success);
-        if (success) {
-          that.startMonitor();
-        }
+      if (jobOptions.jobClass) {
+        url = url + '/' + jobOptions.jobClass;
       }
-    );
-  };
+    }
 
-  Immortus.prototype.startMonitor = function() {
-    var that = this;
+    var verifyCall = function() {
+      $.get(url, null, successFn, 'json').fail(failFn);
+    }
 
-    this.interval = setInterval(function() {
-      $.ajax({
-        url: '/immortus/verify/' + that.job_id,
-        dataType: 'json'
-      }).always(
-        function(data, textStatus, jqXHR) {
-          var req_success = textStatus === 'success';
-          if(!req_success || data.completed) {
-            clearInterval(that.interval);
-            if (req_success) {
-              that.completed(that.job_id, data.status, data.meta);
-            } else {
-              that.error(that.job_id, data.status, data.meta);
-            }
-          } else {
-            // TODO: what should be done? change state callback? nothing?
-          }
-        }
-      );
-    }, this.interval_milliseconds || 1000);
-  };
+    var successFn = function(data) {
+      if(data.completed) {
+        defer.resolve($.extend({}, default_return, data));
+      } else {
+        defer.notify($.extend({}, default_return, data));
+        setTimeout(function() { verifyCall() }, timeout);
+      }
+    };
 
-  api.perform = function(options) {
-    var job = new Immortus(options);
-    job.init();
-  };
+    var failFn = function() {
+      defer.reject(default_return)
+    }
 
-  api.verify = function(options) {
-    var job = new Immortus(options);
-    job.setup();
-    job.startMonitor();
+    verifyCall();
+
+    return defer.promise();
   };
 
   return api;

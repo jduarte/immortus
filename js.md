@@ -11,7 +11,7 @@ Require Immortus in your manifest file ( make sure jQuery is included at this po
 //= require immortus
 ```
 
-### To create and track an async job call in your JS:
+For next examples we are using this simple functions to illustrate what is going on
 
 ```javascript
 var jobCreatedSuccessfully = function(data) {
@@ -19,7 +19,7 @@ var jobCreatedSuccessfully = function(data) {
   console.log('Job ' + data.job_id + ' created successfully');
 
   // We must return here the `job_id` in order for the `verify` function receive this argument.
-  return { JobId: data.job_id, JobClass: data.job_class };
+  return { jobId: data.job_id, jobClass: data.job_class };
 }
 
 var jobFailedToCreate = function() {
@@ -29,7 +29,7 @@ var jobFailedToCreate = function() {
 
 var jobFinished = function(data) {
   // Executed when a job is finished
-  console.log('Job ' + data.job_id + 'finished successfully');
+  console.log('Job ' + data.job_id + ' finished successfully');
 }
 
 var jobFailed = function(data) {
@@ -39,15 +39,33 @@ var jobFailed = function(data) {
 
 var jobInProgress = function(data) {
   // Executed every `verify job` AJAX request (each `longPolling` milliseconds, defaults to 1000)
-  console.log('Job is still executing ...');
+  console.log('Job ' + data.job_id + ' is still executing ...');
 }
+```
 
+### To create and track an async job call in your JS:
+
+```javascript
 Immortus.create('/create_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
-        .then(function(jobOptions) {
-          return Immortus.verify(jobOptions, { longPolling: { interval: 5000 } });
-        })
-        .then(jobFinished, jobFailed, jobInProgress);
+        .done(function(jobObject) {
+          return Immortus.verify(jobObject, { longPolling: { interval: 800 } })
+                         .then(jobFinished, jobFailed, jobInProgress);
+        });
+
+// this will produce:
+//  if fail to create:
+//    Job failed to create
+//  if success creation but fail verify
+//    job a55b6de4-7b06-4b80-b414-8085097488db created successfully
+//    job a55b6de4-7b06-4b80-b414-8085097488db failed to perform
+//  if success creation and verify
+//    job a55b6de4-7b06-4b80-b414-8085097488db created successfully
+//    job a55b6de4-7b06-4b80-b414-8085097488db is still executing ...
+//    job a55b6de4-7b06-4b80-b414-8085097488db is still executing ...
+//    job a55b6de4-7b06-4b80-b414-8085097488db is still executing ...
+//    this previous lines can be repeated more/less times, depending on what the job is doing and `interval`
+//    job a55b6de4-7b06-4b80-b414-8085097488db finished successfully
 ```
 
 ### To only track an existing job without creating it:
@@ -57,14 +75,38 @@ Immortus.create('/create_job')
 // In this case we need to pass the `job_id` directly because
 // it will not be received from the `jobCreatedSuccessfully` callback
 
-jobOptions = { jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417', jobClass: 'job_class' }
-// JobClass is needed if more than 1 strategy is used, otherwise can be ignored
-// if we want to use a custom verify route & controller we could use:
-// jobOptions = { verifyJobUrl: '/custom_verify_path/with_job_id' }
-// this override will ignore all the others,
-// i.e. if verifyJobUrl is defined it will ignore jobId and jobClass
+var jobObject = {
+  // jobId is recommended to be set
+  jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
+  // JobClass is needed if more than 1 strategy is used, otherwise can be ignored
+  jobClass: 'job_class',
+  // if we want to use a custom verify route & controller we could verifyJobUrl
+  // this will override default controller so `jobClass` will be ignored
+  // (unless you use it in your custom controller),
+  // i.e. if verifyJobUrl is defined it will ignore jobId and jobClass
+  verifyJobUrl: '/custom_verify_path/with_job_id'
+};
 
-Immortus.verify(jobOptions, { longPolling: { interval: 5000 } })
+var options = {
+  // currently we only support longPolling
+  longPolling: {
+    // `interval` is the minimum wait time in millisconds from last success request (default is 500)
+    // i.e. if server responds in 200ms and we set `interval` to 800
+    //      we get a new request in server every second (aprox.)
+    interval: 800
+  }
+};
+
+Immortus.verify(jobObject, options)
         .then(jobFinished, jobFailed, jobInProgress);
-});
+
+// this will produce:
+//  if fail verify
+//    job 908ec6f1-e093-4943-b7a8-7c84eccfe417 failed to perform
+//  if success verify
+//    job 908ec6f1-e093-4943-b7a8-7c84eccfe417 is still executing ...
+//    job 908ec6f1-e093-4943-b7a8-7c84eccfe417 is still executing ...
+//    job 908ec6f1-e093-4943-b7a8-7c84eccfe417 is still executing ...
+//    this previous lines can be repeated more/less times, depending on what the job is doing and `interval`
+//    job 908ec6f1-e093-4943-b7a8-7c84eccfe417 finished successfully
 ```

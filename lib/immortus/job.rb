@@ -11,7 +11,7 @@ module Immortus
     after_perform :tracker_finish_job
 
     def strategy
-      @strategy ||= strategy_class.new
+      @strategy ||= self.class.strategy_class.new
     end
 
     def self.strategy_class

@@ -129,10 +129,10 @@ var jobFailed = function(data) {
 }
 
 Immortus.create('/generate_invoice')
-        .then(function(job_id) {
-          return Immortus.verify({ job_id: job_id });
-        })
-        .then(jobFinished, jobFailed);
+        .done(function(data) {
+          return Immortus.verify({ jobId: data.job_id })
+                         .then(jobFinished, jobFailed);
+        });
 ```
 
 To only track an existing job without creating it:
@@ -422,7 +422,7 @@ To create and track an async job call in your JS:
 var jobCreatedSuccessfully = function(data) {
   // logic to add some loading gif
 
-  return data.job_id;
+  return { job_id: data.job_id };
 }
 
 var jobFailedToCreate = function() {
@@ -443,17 +443,18 @@ var jobInProgress = function(data) {
 
 Immortus.create('/generate_big_background_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
-        .then(function(job_id) {
-          return Immortus.verify({ job_id: job_id }, { longPolling: { interval: 5000 } });
+        .then(function(jobObject) {
+          return Immortus.verify(jobObject, { longPolling: { interval: 1800 } });
+                         .then(jobFinished, jobFailed, jobInProgress);
         })
-        .then(jobFinished, jobFailed, jobInProgress);
 ```
 
 To only track an existing job without creating it:
 
 ```javascript
 // render_immortus returns the job_class. in this case since we don't use the create job we need to pass the jobClass manually
-Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'big_background_job' }, { longPolling: { interval: 5000 } })
+Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'BigBackgroundJob' },
+                { longPolling: { interval: 1800 } })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
 
