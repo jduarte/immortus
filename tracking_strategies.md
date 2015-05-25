@@ -53,7 +53,7 @@ callback from ActiveJob called when job is successfully finished
 
 ### completed?(job_id)
 
-mandatory method.
+mandatory method if using default verify controller.
 
 should return a boolean ( true if job is finished, false otherwise )
 

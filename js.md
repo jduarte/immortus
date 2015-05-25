@@ -7,8 +7,6 @@ Require Immortus JS
 Require Immortus in your manifest file ( make sure jQuery is included at this point ):
 
 ```javascript
-// in your main js file: usually assets/javascript/application.js
-
 //= ...
 //= require immortus
 ```
@@ -21,7 +19,7 @@ var jobCreatedSuccessfully = function(data) {
   console.log('Job ' + data.job_id + ' created successfully');
 
   // We must return here the `job_id` in order for the `verify` function receive this argument.
-  return data.job_id;
+  return { JobId: data.job_id, JobClass: data.job_class };
 }
 
 var jobFailedToCreate = function() {
@@ -46,8 +44,8 @@ var jobInProgress = function(data) {
 
 Immortus.create('/create_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
-        .then(function(job_id) {
-          return Immortus.verify('/verify_job/' + job_id, { longPolling: { interval: 5000 } });
+        .then(function(jobOptions) {
+          return Immortus.verify(jobOptions, { longPolling: { interval: 5000 } });
         })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
@@ -56,8 +54,17 @@ Immortus.create('/create_job')
 
 ```javascript
 // You can also use only the `verify` callback to verify only without creating the job.
-// In this case we need to pass the `job_id` directly because it will not be received from the `jobCreatedSuccessfully` callback
-Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', jobClass: 'job_class' }, { longPolling: { interval: 5000 } })
+// In this case we need to pass the `job_id` directly because
+// it will not be received from the `jobCreatedSuccessfully` callback
+
+jobOptions = { jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417', jobClass: 'job_class' }
+// JobClass is needed if more than 1 strategy is used, otherwise can be ignored
+// if we want to use a custom verify route & controller we could use:
+// jobOptions = { verifyJobUrl: '/custom_verify_path/with_job_id' }
+// this override will ignore all the others,
+// i.e. if verifyJobUrl is defined it will ignore jobId and jobClass
+
+Immortus.verify(jobOptions, { longPolling: { interval: 5000 } })
         .then(jobFinished, jobFailed, jobInProgress);
 });
 ```

@@ -50,10 +50,10 @@ Rails.application.routes.draw do
     post "generate_invoice", :to => "invoices#generate"
     # other routes to jobs may be added here
 
-    # this will create under the hood
-      # get '/immortus/verify/:job_id', :to => 'immortus#verify_job'
-      # post '/generate_invoice', :to => 'invoices#generate'
-      # other routes to jobs
+    # `immortus_jobs` will create under the hood
+    #   get '/immortus/verify/:job_id', :to => 'immortus#verify_job'
+    #   post '/generate_invoice', :to => 'invoices#generate'
+    #   other routes to jobs
   end
 end
 ```
@@ -67,7 +67,7 @@ class InvoicesController < ApplicationController
     job = GenerateInvoiceJob.perform_later
     render_immortus job
 
-    # this will create under the hood
+    # `render_immortus` will create under the hood
     #   if job.try('job_id')
     #     render json: { job_id: job.job_id, job_class: job.class }
     #   else
@@ -112,8 +112,6 @@ for more details check the [Immortus Job section](job.md)
 Require Immortus in your manifest file ( make sure jQuery is included at this point ):
 
 ```javascript
-// in your main js file: usually assets/javascript/application.js
-
 //= ...
 //= require immortus
 ```
@@ -194,7 +192,7 @@ class GenerateInvoiceJob < Immortus::Job
 end
 ```
 
-#### Define your own tracking strategy
+#### Define your own tracking strategy with default verify controller
 
 ```ruby
 # app/jobs/tracking_strategy/my_custom_tracking_strategy.rb
@@ -243,6 +241,81 @@ end
 Immortus::Job.tracking_strategy = :my_custom_tracking_strategy
 # you could also specify the class directly:
 # Immortus::Job.tracking_strategy = TrackingStrategy::MyCustomTrackingStrategy
+```
+
+#### Define your own tracking strategy with custom verify controller
+
+you could define a custom controller to better fit your custom strategy
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  # ...
+
+  get  "verify_job_custom_verify/:job_id", :to => "job_custom_verify#verify"
+end
+```
+
+```ruby
+# app/controllers/job_custom_verify_controller.rb
+class JobCustomVerifyController < ApplicationController
+  def verify
+    strategy = JobCustomVerify.strategy
+
+    # returned `json` will be available in `data` within JS callbacks
+    # `completed` should be one of returned `json` parameters
+
+    render json: {
+      :completed => strategy.completed?(params[:job_id]),
+      :percentage => strategy.percentage(params[:job_id])
+    }
+  end
+end
+```
+
+```ruby
+# app/jobs/tracking_strategy/job_custom_verify_strategy.rb
+module TrackingStrategy
+  class JobCustomVerifyStrategy
+
+    def job_enqueued(job_id)
+      # Save in a custom table that this job was created
+      JobCustomVerifyTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
+    end
+
+    def job_started(job_id)
+      job = find(job_id)
+      job.update_attributes(status: 'running')
+    end
+
+    def job_finished(job_id)
+      job = find(job_id)
+      job.update_attributes(status: 'finished', percentage: 100)
+    end
+
+    def update_percentage(job_id, percentage)
+      job = find(job_id)
+      job.update_attributes(percentage: percentage)
+    end
+
+    def percentage(job_id)
+      job = find(job_id)
+      job.percentage
+    end
+
+    def completed?(job_id)
+      job = find(job_id)
+      job.status == 'finished'
+    end
+
+    private
+
+    def find(job_id)
+      JobCustomVerifyTable.find_by(job_id: job_id)
+    end
+
+  end
+end
 ```
 
 for more details check the [Custom Tracking Strategies section](tracking_strategies.md#custom-strategy)
@@ -434,8 +507,10 @@ ROADMAP
 - [ ] Rewrite what render_immortus(job) does under the hood in the README
 - [x] Use a consistent specs/tests syntax
 - [ ] Setup testing environment to work with different Ruby versions and Rails versions
+- [ ] Ensure JS callbacks `data` is available
+- [ ] Ensure gem tracking strategies have a public `completed?` method
 
-1.0
+Soon
 
 - [ ] Specs
     - [ ] render_immortus
@@ -461,15 +536,12 @@ ROADMAP
     - [ ] Sucker Punch
     - [ ] Active Job Inline
 
-1.1
+Later
 
-- [ ] Remove jQuery dependency ( ajax request using xmlhttp )
 - [ ] Error handling: http://www.sitepoint.com/dont-get-activejob/
 - [ ] progress bar?: https://www.infinum.co/the-capsized-eight/articles/progress-bar-in-rails
 - [ ] How to handle jobs that are divided into multiple sub-jobs
-
-Later
-
+- [ ] Remove jQuery dependency? ( ajax request using xmlhttp, promises )
 - [ ] WebSockets support
     - [ ] ActionCable support
 - [ ] Remove ActiveJob dependency ( support using Backends directly "Delayed Job", "Sidekiq", etc )
