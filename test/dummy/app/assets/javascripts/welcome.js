@@ -5,7 +5,7 @@ $(function() {
     var jobCreatedSuccessfully = function(data) {
       console.log('job ' + data.job_id + ' created');
 
-      return { jobId: data.job_id, jobClass: data.job_class };
+      return data;
     }
 
     var jobFailedToCreate = function() {

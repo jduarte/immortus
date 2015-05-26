@@ -18,9 +18,14 @@ var jobCreatedSuccessfully = function(data) {
   // Executed when `create job` AJAX request returns with a 2xx status code
   console.log('Job ' + data.job_id + ' created successfully');
 
-  // We must return here the `job_id` in order for the `verify` function receive this argument.
-  // We also must return the `job_class` if using more then 1 strategy in application.
-  return { jobId: data.job_id, jobClass: data.job_class };
+  // We must return here the `job_id` or `verifyJobUrl` in order for the `verify` function receive this argument.
+  // We also must return the `job_class` if using more then 1 strategy in application and `verifyJobUrl` is not sent.
+  // ex.:
+  // return { job_id: data.job_id, job_class: data.job_class }
+  // or
+  // return { verifyJobUrl: '/my_custom_verify_route/' + data.job_id }
+  // since data by default has all we need we are returning it
+  return data;
 }
 
 var jobFailedToCreate = function() {
@@ -35,11 +40,15 @@ var jobFinished = function(data) {
 
 var jobFailed = function(data) {
   // Executed when a `verify job` AJAX requests returns with a non 2xx status code
+  // Depending on how controller code it's done, and type of error, data could be empty.
+  // Ex.:
+  // if we set to a wrong verify route (i.e. with a typo, not in routes, etc) we will receive an empty data.
   console.log('Job ' + data.job_id + ' failed to perform');
 }
 
 var jobInProgress = function(data) {
-  // Executed every `verify job` AJAX request (each `longPolling` milliseconds, defaults to 1000)
+  // Executed every `verify job` AJAX request
+  // each `longPolling.interval` milliseconds (defaults to 500) after last success
   console.log('Job ' + data.job_id + ' is still executing ...');
 }
 ```
@@ -49,8 +58,8 @@ var jobInProgress = function(data) {
 ```javascript
 Immortus.create('/create_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
-        .done(function(jobObject) {
-          return Immortus.verify(jobObject, { longPolling: { interval: 800 } })
+        .done(function(jobInfo) {
+          return Immortus.verify(jobInfo, { longPolling: { interval: 800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 
@@ -76,15 +85,15 @@ Immortus.create('/create_job')
 // In this case we need to pass the `job_id` directly because
 // it will not be received from the `jobCreatedSuccessfully` callback
 
-var jobObject = {
+var jobInfo = {
   // jobId is recommended to be set
   jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
   // JobClass is needed if more than 1 strategy is used, otherwise can be ignored
   jobClass: 'job_class',
-  // if we want to use a custom verify route & controller we could verifyJobUrl
+  // if we want to use a custom verify route & controller we could set verifyJobUrl
   // this will override default controller so `jobClass` will be ignored
   // (unless you use it in your custom controller),
-  // i.e. if verifyJobUrl is defined it will ignore jobId and jobClass
+  // i.e. if verifyJobUrl is defined it will ignore `jobId` and `jobClass`
   verifyJobUrl: '/custom_verify_path/with_job_id'
 };
 
@@ -98,7 +107,7 @@ var options = {
   }
 };
 
-Immortus.verify(jobObject, options)
+Immortus.verify(jobInfo, options)
         .then(jobFinished, jobFailed, jobInProgress);
 
 // this will produce:

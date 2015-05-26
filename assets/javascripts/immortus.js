@@ -8,14 +8,13 @@ var Immortus = (function() {
   api.verify = function(jobOptions, options) {
     var defer = $.Deferred();
     var url = jobOptions.verifyJobUrl;
-    var default_return = { job_id: jobOptions.jobId };
     var timeout = (options.longPolling && options.longPolling.interval) || 500
 
     if(!url) {
-      url = '/immortus/verify/' + jobOptions.jobId;
+      url = '/immortus/verify/' + jobOptions.job_id;
 
-      if (jobOptions.jobClass) {
-        url = url + '/' + jobOptions.jobClass;
+      if (jobOptions.job_class) {
+        url = url + '/' + jobOptions.job_class;
       }
     }
 
@@ -23,17 +22,17 @@ var Immortus = (function() {
       $.get(url, null, successFn, 'json').fail(failFn);
     }
 
-    var successFn = function(data) {
+    var successFn = function(data, textStatus, jqXHR) {
       if(data.completed) {
-        defer.resolve($.extend({}, default_return, data));
+        defer.resolve(data);
       } else {
-        defer.notify($.extend({}, default_return, data));
+        defer.notify(data);
         setTimeout(function() { verifyCall() }, timeout);
       }
     };
 
-    var failFn = function() {
-      defer.reject(default_return)
+    var failFn = function(jqXHR, textStatus, errorThrown) {
+      defer.reject(jqXHR.responseJSON || {})
     }
 
     verifyCall();
