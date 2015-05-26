@@ -90,14 +90,6 @@ class GenerateInvoiceJob < ActiveJob::Base
 end
 ```
 
-`Immortus::Job` is still a subclass of `ActiveJob` so you can continue to use all the code that you could've used in a regular ActiveJob class.
-
-```ruby
-GenerateInvoiceJob.new.is_a?(ActiveJob) # => true
-```
-
-for more details check the [Immortus Job section](job.md)
-
 ##### Javascript
 
 Require Immortus in your manifest file ( make sure jQuery is included at this point ):
