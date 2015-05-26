@@ -81,18 +81,9 @@ end
 
 ```ruby
 # app/jobs/generate_invoice_job.rb
-class GenerateInvoiceJob < ActiveJob
-  def perform(record)
-    # Generate invoices ...
-  end
-end
-```
+class GenerateInvoiceJob < ActiveJob::Base
+  include Immortus::Job
 
-to
-
-```ruby
-# app/jobs/generate_invoice_job.rb
-class GenerateInvoiceJob < Immortus::Job
   def perform(record)
     # Generate invoices ...
   end
@@ -183,7 +174,9 @@ By default all `Immortus::Job` subclasses will inherit the default tracking stra
 
 ```ruby
 # app/jobs/generate_invoice_job.rb
-class GenerateInvoiceJob < Immortus::Job
+class GenerateInvoiceJob < ActiveJob::Base
+  include Immortus::Job
+
   tracking_strategy :redis_pub_sub_strategy
 
   def perform(record)
@@ -403,7 +396,9 @@ end
 
 ```ruby
 # app/jobs/big_background_job.rb
-class BigBackgroundJob < Immortus::Job
+class BigBackgroundJob < ActiveJob::Base
+  include Immortus::Job
+
   tracking_strategy :big_background_job_strategy
 
   def perform(record)
@@ -502,14 +497,12 @@ ROADMAP
 - [x] Define Immortus::Job Strategy interface and expected return values
     - [x] Wiki explaining on how inferred strategies work
 - [x] Define Immortus.JS interface for handling successful and error responses
-- [ ] Rewrite what render_immortus(job) does under the hood in the README
-    - [ ] should return error message?
-- [ ] Setup testing environment to work with different Ruby versions and Rails versions
-- [ ] Ensure JS callbacks `data` is available
 - [x] Ensure gem tracking strategies have a public `completed?` method
-- [ ] consider using a custom JS class (ImmortusJob?)
-- [ ] change Immortus::Job to be a module and include instead of superclass
-- [ ] in-line tracking strategy
+- [x] change Immortus::Job to be a module and include instead of superclass
+- [x] in-line tracking strategy
+- [ ] Ensure JS callbacks `data` is available
+- [ ] Rewrite what render_immortus(job) does under the hood in the README
+- [ ] Setup testing environment to work with different Ruby versions and Rails versions
 
 Soon
 

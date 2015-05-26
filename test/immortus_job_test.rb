@@ -8,6 +8,10 @@ require 'minitest/stub_any_instance'
 class ImmortusJobTest < ActiveJob::TestCase
   extend Minitest::Spec::DSL
 
+  def setup
+    Immortus::Job.tracking_strategy = nil
+  end
+
   let(:strategy_mock) { Minitest::Mock.new }
   let(:strategy_spy_mock) { Spy.mock(Immortus::TrackingStrategy::EmptyStrategy) }
 
@@ -68,7 +72,18 @@ class ImmortusJobTest < ActiveJob::TestCase
 
   test 'strategy class should call StrategyFinder find' do
     find_spy = Spy.on(Immortus::StrategyFinder, :find)
-    Immortus::Job.strategy_class
+    WaitABitJob.strategy_class
     assert find_spy.has_been_called?
+  end
+
+  test 'read tracking_strategy' do
+    assert Immortus::Job.respond_to? :tracking_strategy
+  end
+
+  test 'write tracking_strategy' do
+    some_strategy = :some_strategy
+    Immortus::Job.tracking_strategy = some_strategy
+
+    assert_equal some_strategy, Immortus::Job.tracking_strategy
   end
 end

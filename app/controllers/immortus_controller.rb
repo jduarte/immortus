@@ -15,11 +15,11 @@ class ImmortusController < ActionController::Base
   def strategy
     return @strategy if @strategy
     if params[:job_class] && (!!Module.const_get(params[:job_class]) rescue false)
-      job = params[:job_class].constantize
+      strategy_class = params[:job_class].constantize.strategy_class
     else
-      job = Immortus::Job
+      strategy_class = Immortus::StrategyFinder.find
     end
 
-    @strategy = job.strategy_class.new
+    @strategy = strategy_class.new
   end
 end

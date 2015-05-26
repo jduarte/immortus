@@ -3,6 +3,10 @@ require 'minitest/mock'
 
 class ImmortusStrategyFinderTest < ActiveJob::TestCase
 
+  def setup
+    Immortus::Job.tracking_strategy = nil
+  end
+
   StrategyTestStruct = Struct.new(:active_job_queue_adapter,
                                   :immortus_job_tracking_strategy,
                                   :strategy_class)
@@ -53,6 +57,10 @@ class ImmortusStrategyFinderTest < ActiveJob::TestCase
     Immortus::Job.stub(:tracking_strategy, :custom_app_strategy) do
       assert_equal Immortus::StrategyFinder.find, TrackingStrategy::CustomAppStrategy
     end
+  end
+
+  test 'inline job strategy' do
+    assert_equal TrackingStrategy::CustomAppStrategy, InlineStrategyJob.strategy_class
   end
 
 end
