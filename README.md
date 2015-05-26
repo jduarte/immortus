@@ -463,7 +463,7 @@ Contributing
 
 Credits
 ---
-![Runtime Revolution](https://pbs.twimg.com/profile_images/569571806634196992/GU3JsMP4.png)
+![Runtime Revolution](http://lh3.googleusercontent.com/-iRjFzclpFKg/AAAAAAAAAAI/AAAAAAAAABk/aVVbuMI11WA/s265-c-k-no/photo.jpg)
 [Runtime Revolution](http://www.runtime-revolution.com/)
 
 ROADMAP
