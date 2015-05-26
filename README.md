@@ -13,11 +13,11 @@ You can use one of our pre-implemented tracking strategy or create your own.
 
 ### When should I use Immortus
 
-When you need to keep track of an async job. For example:
+When you need to keep track of an async job.
+For example:
 
 - send emails
-- upload an image
-- process an image
+- upload / process an image
 - import / export files ( .xls, .csv, ... )
 - etc.
 
@@ -198,19 +198,18 @@ module TrackingStrategy
       job.update_attributes(status: 'finished')
     end
 
+    # completed? method is mandatory, should return a boolean ( true if job is finished, false otherwise )
     def completed?(job_id)
-      # completed? method is mandatory, should return a boolean ( true if job is finished, false otherwise )
       job = find(job_id)
       job.status == 'finished'
     end
 
+    # if meta method is defined, the returned hash will be added in every verify request
     def meta(job_id)
-      # if meta method is defined, the returned hash will be added in every verify request
       job = find(job_id)
 
       {
-        last_error: job.last_error,
-        attempts: job.attempts
+        status: job.status
       }
     end
 
@@ -342,8 +341,7 @@ module TrackingStrategy
   class ProcessImageStrategy
 
     def job_enqueued(job_id)
-      # Save in a custom table that this job was created
-      ProcessImageJobTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
+      ProcessImageTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
     end
 
     def job_started(job_id)
@@ -377,7 +375,7 @@ module TrackingStrategy
     private
 
     def find(job_id)
-      ProcessImageJobTable.find_by(job_id: job_id)
+      ProcessImageTable.find_by(job_id: job_id)
     end
 
   end
@@ -430,8 +428,8 @@ var jobInProgress = function(data) {
 
 Immortus.create('/process_image')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
-        .then(function(jobObject) {
-          return Immortus.verify(jobObject, { longPolling: { interval: 1800 } })
+        .then(function(jobInfo) {
+          return Immortus.verify(jobInfo, { longPolling: { interval: 1800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 ```
@@ -439,9 +437,10 @@ Immortus.create('/process_image')
 To only track an existing job without creating it:
 
 ```javascript
-// render_immortus returns the job_class. in this case since we don't use the create job we need to pass the jobClass manually
-Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'ProcessImageJob' },
-                { longPolling: { interval: 1800 } })
+// render_immortus returns the job_class.
+// in this case since we don't use the create job so we need to pass the jobClass manually.
+var jobInfo = { job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'ProcessImageJob' }
+Immortus.verify(jobInfo, { longPolling: { interval: 1800 } })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
 
