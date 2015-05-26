@@ -308,7 +308,7 @@ for more details check the [Custom Tracking Strategies section](tracking_strateg
 You can use Immortus in almost any case
 ---
 
-let's use it to update a percentage of a big background job
+let's use it to update a percentage when we process a big image
 
 ##### Create job routes
 
@@ -318,7 +318,7 @@ Rails.application.routes.draw do
   # ...
 
   immortus_jobs do
-    post "generate_big_background_job", :to => "big_background_job#generate"
+    post "process_image", :to => "image#process"
   end
 end
 ```
@@ -326,10 +326,10 @@ end
 ##### Controller
 
 ```ruby
-# app/controllers/big_background_job_controller.rb
-class BigBackgroundJobController < ApplicationController
-  def generate
-    job = BigBackgroundJob.perform_later
+# app/controllers/image_controller.rb
+class ImageController < ApplicationController
+  def process
+    job = ProcessImageJob.perform_later
 
     render_immortus job
   end
@@ -337,13 +337,13 @@ end
 ```
 
 ```ruby
-# app/jobs/tracking_strategy/big_background_job_strategy.rb
+# app/jobs/tracking_strategy/process_image_strategy.rb
 module TrackingStrategy
-  class BigBackgroundJobStrategy
+  class ProcessImageStrategy
 
     def job_enqueued(job_id)
       # Save in a custom table that this job was created
-      BigBackgroundJobTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
+      ProcessImageJobTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
     end
 
     def job_started(job_id)
@@ -377,7 +377,7 @@ module TrackingStrategy
     private
 
     def find(job_id)
-      BigBackgroundJobTable.find_by(job_id: job_id)
+      ProcessImageJobTable.find_by(job_id: job_id)
     end
 
   end
@@ -387,11 +387,11 @@ end
 ##### create `Immortus::Job` with our custom strategy
 
 ```ruby
-# app/jobs/big_background_job.rb
-class BigBackgroundJob < ActiveJob::Base
+# app/jobs/process_image_job.rb
+class ProcessImageJob < ActiveJob::Base
   include Immortus::Job
 
-  tracking_strategy :big_background_job_strategy
+  tracking_strategy :process_image_strategy
 
   def perform(record)
     # do some heavy processing ...
@@ -409,7 +409,7 @@ To create and track an async job call in your JS:
 var jobCreatedSuccessfully = function(data) {
   // logic to add some loading gif
 
-  return { job_id: data.job_id };
+  return { job_id: data.job_id, job_class: data.job_class };
 }
 
 var jobFailedToCreate = function() {
@@ -417,7 +417,7 @@ var jobFailedToCreate = function() {
 }
 
 var jobFinished = function(data) {
-  // logic to finish ...
+  // logic to finish ... like show image thumbnail
 }
 
 var jobFailed = function(data) {
@@ -425,10 +425,10 @@ var jobFailed = function(data) {
 }
 
 var jobInProgress = function(data) {
-  // logic to update percentage with `data.percentage` ...
+  // logic to update percentage with `data.percentage` ... which came from meta method
 }
 
-Immortus.create('/generate_big_background_job')
+Immortus.create('/process_image')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobObject) {
           return Immortus.verify(jobObject, { longPolling: { interval: 1800 } })
@@ -440,7 +440,7 @@ To only track an existing job without creating it:
 
 ```javascript
 // render_immortus returns the job_class. in this case since we don't use the create job we need to pass the jobClass manually
-Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'BigBackgroundJob' },
+Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'ProcessImageJob' },
                 { longPolling: { interval: 1800 } })
         .then(jobFinished, jobFailed, jobInProgress);
 ```
