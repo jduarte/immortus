@@ -6,29 +6,39 @@ How it works
 
 Each job has a strategy that is responsible to track it.
 
-To find which strategy should be used to track a specific job first it will see if specified job has a in-line definition `tracking_strategy :my_custom_tracking_strategy` if not it will try to find if a global configuration `mmortus::Job.tracking_strategy = :my_custom_tracking_strategy` in `config/initializer/immortus.rb` if not it will infer from ActiveJob (default)
+To find which strategy should be used to track a specific job first it will see if specified job has a in-line definition
+
+```ruby
+# app/jobs/some_job.rb
+class SomeJob < Immortus::Job
+  tracking_strategy :my_custom_tracking_strategy
+
+  def perform(record)
+    # Do stuff ...
+  end
+end
+```
+
+if not it will try to find in a global configuration
+
+```ruby
+# config/initializer/immortus.rb
+immortus::Job.tracking_strategy = :my_custom_tracking_strategy
+```
+
+if not it will infer from ActiveJob (default behavior)
 
 Delayed::Job Strategy
 ---
 
-Since Delayed::Job already persist data we don't need none of the callbacks, we just need to define status and find
+Since Delayed::Job already persist data we don't need none of the callbacks, we just need to define completed? and find
 
-### status
-
-##### :finished
+### completed?(job_id)
 
 - Whenever a job is finished Delayed::Job will delete that record from the DB
-- By default, when it reaches the maximum number of failed tries it also delete the record from DB (false positive)
+- By default, when it reaches the maximum number of failed tries it also delete the record from DB (false positive?)
 
-##### :started
-
-- If a job has started perform or has previous attempts (column locked_at has value or column attempts has a number greater than 0)
-
-##### :created
-
-- If none of above
-
-### find
+### find(job_id)
 
 - Look for job_id inside handler column (NOT VERY EFFICIENT...)
 

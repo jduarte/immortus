@@ -10,10 +10,7 @@ module TrackingStrategy
     def job_finished(job_id)
     end
 
-    def find(job_id)
-    end
-
-    def status(job_id)
+    def complete?(job_id)
     end
 
   end

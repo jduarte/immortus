@@ -121,7 +121,7 @@ To create and track an async job call in your JS:
 ```javascript
 var jobFinished = function(data) {
   // Job was completed here. `data` has the info returned in the `GenerateInvoicesController#verify`
-  console.log(data.job_id ' finished successfully.');
+  console.log(data.job_id + ' finished successfully.');
 }
 
 var jobFailed = function(data) {
@@ -252,7 +252,7 @@ you could define a custom controller to better fit your custom strategy
 Rails.application.routes.draw do
   # ...
 
-  get  "verify_job_custom_verify/:job_id", :to => "job_custom_verify#verify"
+  get  "job_custom_verify/:job_id", :to => "job_custom_verify#verify"
 end
 ```
 
@@ -444,9 +444,9 @@ var jobInProgress = function(data) {
 Immortus.create('/generate_big_background_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobObject) {
-          return Immortus.verify(jobObject, { longPolling: { interval: 1800 } });
+          return Immortus.verify(jobObject, { longPolling: { interval: 1800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
-        })
+        });
 ```
 
 To only track an existing job without creating it:
@@ -508,6 +508,8 @@ ROADMAP
 - [ ] Ensure JS callbacks `data` is available
 - [x] Ensure gem tracking strategies have a public `completed?` method
 - [ ] consider using a custom JS class (ImmortusJob?)
+- [ ] change Immortus::Job to be a module and include instead of superclass
+- [ ] in-line tracking strategy
 
 Soon
 
