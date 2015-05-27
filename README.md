@@ -329,13 +329,14 @@ Contributing
 
 Credits
 ---
+
 ![Runtime Revolution](http://lh3.googleusercontent.com/-iRjFzclpFKg/AAAAAAAAAAI/AAAAAAAAABk/aVVbuMI11WA/s265-c-k-no/photo.jpg)
 [Runtime Revolution](http://www.runtime-revolution.com/)
 
 ROADMAP
 ---
 
-0.0.1
+#### 0.0.1
 
 - [x] Tests
 - [x] Routes DSL ( immortus_jobs )
@@ -344,7 +345,7 @@ ROADMAP
 - [x] Tracking Strategies
     - [x] Delayed Job ( AR )
 
-Soon
+#### Soon
 
 - [ ] Setup testing environment to work with different Ruby versions and Rails versions
 - [ ] Tests
@@ -371,7 +372,7 @@ Soon
 - [ ] Ensure JS callbacks `data` is available
 - [ ] LOGS
 
-Later
+#### Future Developments
 
 - [ ] Error handling: http://www.sitepoint.com/dont-get-activejob/
 - [ ] How to handle jobs that are divided into multiple sub-jobs
