@@ -1,16 +1,17 @@
-var Immortus = (function() {
+var Immortus = (function () {
   var api = {};
 
-  api.create = function(url) {
+  api.create = function (url) {
     return $.post(url, null, null, 'json');
   };
 
-  api.verify = function(jobOptions, options) {
+  api.verify = function (jobOptions, options) {
     var defer = $.Deferred();
+    var timeout = (options.longPolling && options.longPolling.interval) || 500;
     var url = jobOptions.verifyJobUrl;
-    var timeout = (options.longPolling && options.longPolling.interval) || 500
+    var verifyCall, successFn, failFn;
 
-    if(!url) {
+    if (!url) {
       url = '/immortus/verify/' + jobOptions.job_id;
 
       if (jobOptions.job_class) {
@@ -18,22 +19,24 @@ var Immortus = (function() {
       }
     }
 
-    var verifyCall = function() {
+    verifyCall = function () {
       $.get(url, null, successFn, 'json').fail(failFn);
-    }
+    };
 
-    var successFn = function(data, textStatus, jqXHR) {
-      if(data.completed) {
+    //function(data, textStatus, jqXHR)
+    successFn = function (data) {
+      if (data.completed) {
         defer.resolve(data);
       } else {
         defer.notify(data);
-        setTimeout(function() { verifyCall() }, timeout);
+        setTimeout(verifyCall, timeout);
       }
     };
 
-    var failFn = function(jqXHR, textStatus, errorThrown) {
-      defer.reject(jqXHR.responseJSON || {})
-    }
+    // function(jqXHR, textStatus, errorThrown)
+    failFn = function (jqXHR) {
+      defer.reject(jqXHR.responseJSON || {});
+    };
 
     verifyCall();
 
@@ -41,4 +44,4 @@ var Immortus = (function() {
   };
 
   return api;
-})();
+}());
