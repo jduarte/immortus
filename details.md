@@ -3,11 +3,14 @@ Immortus Details
 
 Since it's mandatory to be used at least one verify method, so we can check if the job is finished, we created one, doe to convenience, and from now on we will call it __default verify__
 
-We usually have 3 ways of dealing with things:
+In this section we are specifying 3 ways of dealing with things:
 
-- Minimalistic ( more syntactic sugar / hidden behavior )
-- Intermediate
-- Explicit ( clear as water )
+- Minimalistic ( more syntactic sugar / hidden behavior ) - we assume you already have jobs created and just need to know when they finish and just want to change the minimum possible
+- Intermediate - we assume you will create a new background job with an extra field (percentage)
+- Explicit ( clear as water ) - have full control on what is going on doing the same as Intermediate way
+
+In your use case you can mix some of these,
+this is just a detailed example to try to avoid doubts on how should you do things with `Immortus`.
 
 Routes (file: config/routes.rb)
 ---
@@ -25,7 +28,9 @@ Rails.application.routes.draw do
 end
 ```
 
-This is the simplest case possible, to be used when you already got routes to create background jobs and just need to add the __default verify__
+This is the simplest case possible (regarding routing),
+to be used when you already got routes to create background jobs
+and just need to add the __default verify__ so the JS be able to check the job status.
 
 ##### Intermediate
 
@@ -43,7 +48,9 @@ Rails.application.routes.draw do
 end
 ```
 
-The block will be yield exactly as is with the __default verify__ route on top, we do this to remove the need of adding the __default verify__ route and to be possible to have a place for all jobs creation calls (like name-spacing)
+The block given will yield exactly as is with the __default verify__ route on top,
+we do this to remove the need of adding the __default verify__ route
+and to be possible to have a place for all jobs creation calls (like name-spacing)
 
 ##### Explicit
 
@@ -56,60 +63,14 @@ Rails.application.routes.draw do
 end
 ```
 
-This example do __exactly__ the same as previous one.
-This should be used if we explicitly want to see what is going on or if we don't need __default verify__.
+This should be used if we explicitly want to see what is going on or if we don't need __default verify__ (case presented).
 
-Note that you don't need to use the __default verify__, you could create your own.
-
-Generate job method
----
-
-##### Minimalistic
-
-If you already create the job in your current APP you don't need to worry with this step
-
-##### Intermediate
-
-```ruby
-class JobController < ApplicationController
-  def generate
-    job = MyJob.perform_later
-    render_immortus job
-
-    # `render_immortus job` is same as write:
-    # if job.try('job_id')
-    #   render json: { job_id: job.job_id, job_class: job.class.name }
-    # else
-    #   render json: {}, status: 500
-    # end
-  end
-end
-```
-
-If you are adding a new job created by a JS call (we explain this in detail in __JS Create__ section)
-
-##### Explicit
-
-```ruby
-class JobController < ApplicationController
-  def generate
-    job = MyJob.perform_later
-    if job.try('job_id')
-      render json: { job_id: job.job_id, job_class: job.class.name }
-    else
-      render json: {}, status: 500
-    end
-  end
-end
-```
-
-This example do __exactly__ the same as previous one.
-This should be used if we explicitly want to see what is going on or you need to add more info to __JS Create__ Callbacks
+In this case we also need the custom verify, defined in __Verify job method__ section
 
 Job
 ---
 
-Just add `include Immortus::Job` into your job. Example:
+Just add `include Immortus::Job` into your ActiveJob. Example:
 
 ```ruby
 # app/jobs/generate_invoice_job.rb
@@ -125,6 +86,8 @@ end
 Tracking Strategy
 ---
 
+This is how we keep track of any job
+
 ##### Minimalistic
 
 If you just need to check job completeness you could use the default strategy
@@ -137,8 +100,7 @@ module TrackingStrategy
   class MyCustomTrackingStrategy
 
     def job_enqueued(job_id)
-      # Save in a custom table that this job was created
-      MyCustomTrackingJobTable.create!(job_id: job_id, status: 'created')
+      MyCustomTrackingJobTable.create!(job_id: job_id, status: 'created', percentage: 0)
     end
 
     def job_started(job_id)
@@ -147,7 +109,12 @@ module TrackingStrategy
 
     def job_finished(job_id)
       job = find(job_id)
-      job.update_attributes(status: 'finished')
+      job.update_attributes(status: 'finished', percentage: 100)
+    end
+
+    def update_percentage(job_id, percentage)
+      job = find(job_id)
+      job.update_attributes(percentage: percentage)
     end
 
     # completed? method is mandatory, should return a boolean ( true if job is finished, false otherwise )
@@ -161,7 +128,7 @@ module TrackingStrategy
       job = find(job_id)
 
       {
-        status: job.status
+        percentage: job.percentage
       }
     end
 
@@ -172,6 +139,19 @@ module TrackingStrategy
     end
   end
 end
+```
+
+In this case we need to create a `meta(job_id)` method so __default verify__ can send extra data (percentage) to JS.
+
+We also need a way to update percentage, it should be called inside our job perform method something like:
+
+```ruby
+self.strategy.update_percentage(job_id, percentage)
+```
+
+our job should also have so it can use this strategy
+```ruby
+tracking_strategy :my_custom_tracking_strategy
 ```
 
 ##### Explicit
@@ -221,10 +201,19 @@ module TrackingStrategy
 end
 ```
 
+To update percentage, it should be called inside our job perform method something like:
+
+```ruby
+self.strategy.update_percentage(job_id, percentage)
+```
+
+our job should also have so it can use this strategy
+```ruby
+tracking_strategy :job_custom_verify_strategy
+```
+
 How to add a Custom Traking Strategy to a Job
 ---
-
-Each job has a strategy that is responsible to track it.
 
 To find which strategy should be used to track a specific job first it will see if specified job has a in-line definition
 
@@ -253,7 +242,7 @@ Verify job method
 
 ##### Minimalistic & Intermediate
 
-If you just need to know if job is completed or have meta in your strategy you could use __default verify__
+We use __default verify__ in both these cases, so nothing to do here.
 
 ##### Explicit
 
@@ -261,10 +250,7 @@ If you just need to know if job is completed or have meta in your strategy you c
 # app/controllers/job_custom_verify_controller.rb
 class JobCustomVerifyController < ApplicationController
   def verify
-    strategy = JobCustomVerify.strategy
-
-    # returned `json` will be available in `data` within JS callbacks
-    # `completed` should be one of returned `json` parameters
+    strategy = MyJob.strategy
 
     render json: {
       :completed => strategy.completed?(params[:job_id]),
@@ -273,6 +259,55 @@ class JobCustomVerifyController < ApplicationController
   end
 end
 ```
+
+returned `json` will be available in `data` within JS callbacks
+
+`completed` must be one of returned `json` parameters, so JS knows when to stop long polling
+
+Generate job method
+---
+
+##### Minimalistic
+
+If you already create the job in your current APP you don't need to worry with this step
+
+##### Intermediate
+
+```ruby
+class JobController < ApplicationController
+  def generate
+    job = MyJob.perform_later
+    render_immortus job
+
+    # `render_immortus job` is same as write:
+    # if job.try('job_id')
+    #   render json: { job_id: job.job_id, job_class: job.class.name }
+    # else
+    #   render json: {}, status: 500
+    # end
+  end
+end
+```
+
+If you are adding a new job created by a JS call (we explain this in detail in __JS Create__ section)
+
+##### Explicit
+
+```ruby
+class JobController < ApplicationController
+  def generate
+    job = MyJob.perform_later
+    if job.try('job_id')
+      render json: { job_id: job.job_id, job_class: job.class.name }
+    else
+      render json: {}, status: 500
+    end
+  end
+end
+```
+
+This example do __exactly__ the same as previous one.
+This should be used if we explicitly want to see what is going on or you need to add more info to __JS Create__ Callbacks
 
 JS
 ---
@@ -295,8 +330,6 @@ In simplest case you already create background jobs. so nothing to do here.
 
 ##### Intermediate
 
-If you need/want to create a background job and track it's completeness you could do:
-
 ```javascript
 var jobFinished = function(data) {
   // Job was completed here. `data` has the info returned in the 'Intermediate', 'Explicit' `JobController#verify`
@@ -307,16 +340,20 @@ var jobFailed = function(data) {
   console.log('error in job ' + data.job_id);
 };
 
+var jobInProgress = function(data) {
+  // logic to update percentage with `data.percentage` ... which came from meta method
+};
+
 Immortus.create('/generate_invoice')
         .done(function(data) {
           return Immortus.verify({ jobId: data.job_id })
-                         .then(jobFinished, jobFailed);
+                         .then(jobFinished, jobFailed, jobInProgress);
         });
 ```
 
-##### Explicit
+In this example we assume that creation of job never fail (if it fails it does nothing)
 
-If you need/want to create a background job and track not only it's completeness but also the percentage of it you could do:
+##### Explicit
 
 ```javascript
 var jobCreatedSuccessfully = function(data) {
@@ -344,10 +381,13 @@ var jobInProgress = function(data) {
 Immortus.create('/process_image')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobInfo) {
+          jobInfo.verifyJobUrl = '/job_custom_verify/908ec6f1-e093-4943-b7a8-7c84eccfe417';
           return Immortus.verify(jobInfo, { longPolling: { interval: 1800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 ```
+
+In this example, we differ from Intermediate by handling creation success/error, and setting long polling parameters just to show what we can control.
 
 For all the options check the details in [Immortus JavaScript section](js.md)
 
@@ -362,21 +402,22 @@ If you create some job and then redirect to a page where you need to know when i
 
 ```javascript
 var jobFinished = function(data) {
-  // Job was completed here. `data` has the info returned in the `render_immortus`
+  // Job was completed here. `data` has the info returned in `default verify`
+  // i.e. data = { job_id: ... , completed: true }
   console.log(data.job_id + ' finished successfully.');
 };
 
 var jobFailed = function(data) {
-  console.log('error in job ' + data.job_id);
+  // Job was completed here. `data` has the info returned in `default verify`
+  // i.e. data = {}
+  console.log('error in job');
 };
 
 Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417' })
         .then(jobFinished, jobFailed);
 ```
 
-##### Intermediate & Explicit
-
-To use percentage you could set `jobInProgress`
+##### Intermediate
 
 ```javascript
 var jobFinished = function(data) {
@@ -394,8 +435,39 @@ var jobInProgress = function(data) {
 
 var jobInfo = {
   jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
-  jobClass: 'job_class',
-  verifyJobUrl: '/custom_verify_path/with_job_id'
+  jobClass: 'my_job'
+};
+
+var options = {
+  longPolling: {
+    interval: 800
+  }
+};
+
+Immortus.verify(jobInfo, options)
+        .then(jobFinished, jobFailed, jobInProgress);
+```
+
+In this case we need to send `jobClass` so __default verify__ could know what job is working with
+
+##### Explicit
+
+```javascript
+var jobFinished = function(data) {
+  // Job was completed here. `data` has the info returned in the `JobCustomVerifyController#verify`
+  console.log(data.job_id + ' finished successfully.');
+};
+
+var jobFailed = function(data) {
+  console.log('error in job ' + data.job_id);
+};
+
+var jobInProgress = function(data) {
+  // logic to update percentage with `data.percentage` ... which came from meta method
+};
+
+var jobInfo = {
+  verifyJobUrl: '/job_custom_verify/908ec6f1-e093-4943-b7a8-7c84eccfe417'
 };
 
 var options = {
