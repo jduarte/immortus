@@ -156,7 +156,6 @@ Here is a list of the ActiveJob queue adapter and its mapped strategies:
 |              :sneakers |           N/A           |                              N/A                              |
 |          :sucker_punch |           N/A           |                              N/A                              |
 |                :inline |           N/A           |                              N/A                              |
-|                  :test |           N/A           |                              N/A                              |
 
 #### Override the default strategy
 
@@ -336,35 +335,17 @@ ROADMAP
 
 0.1
 
-- [x] Initial Specs
-    - [x] Immortus controller
-    - [x] Immortus::StrategyFinder
-    - [x] Immortus::Job callbacks
-    - [x] Tracking Strategies
-        - [x] Delayed Job (AR)
-- [x] Build Initial Version
-    - [x] Routes DSL ( immortus_jobs )
-    - [x] JS ( Immortus.perform )
-    - [x] JS ( Immortus.verify )
-    - [x] JS ( Immortus long polling )
-    - [x] Render ( render_immortus )
-    - [x] ImmortusController#verify
-        - [x] Tracking Strategies
-            - [x] Delayed Job ( AR )
-- [x] Define Immortus::Job Strategy interface and expected return values
-    - [x] Wiki explaining on how inferred strategies work
-- [x] Define Immortus.JS interface for handling successful and error responses
-- [x] Ensure gem tracking strategies have a public `completed?` method
-- [x] change Immortus::Job to be a module and include instead of superclass
-- [x] in-line tracking strategy
-- [ ] Ensure JS callbacks `data` is available
-- [ ] Rewrite what render_immortus(job) does under the hood in the README
-- [ ] Setup testing environment to work with different Ruby versions and Rails versions
+- [x] Tests
+- [x] Routes DSL ( immortus_jobs )
+- [x] Immortus JS long polling
+- [x] default verify ( ImmortusController#verify )
+- [x] Tracking Strategies
+    - [x] Delayed Job ( AR )
 
 Soon
 
-- [ ] Specs
-    - [ ] render_immortus
+- [ ] Setup testing environment to work with different Ruby versions and Rails versions
+- [ ] Tests
     - [ ] Tracking Strategies
         - [ ] Backburner
         - [ ] Qu
@@ -375,7 +356,6 @@ Soon
         - [ ] Sneakers
         - [ ] Sucker Punch
         - [ ] Active Job Inline
-- [ ] LOGS
 - [ ] Tracking Strategies
     - [ ] Backburner
     - [ ] Qu
@@ -386,16 +366,14 @@ Soon
     - [ ] Sneakers
     - [ ] Sucker Punch
     - [ ] Active Job Inline
+- [ ] Ensure JS callbacks `data` is available
+- [ ] LOGS
 
 Later
 
 - [ ] Error handling: http://www.sitepoint.com/dont-get-activejob/
-- [ ] progress bar?: https://www.infinum.co/the-capsized-eight/articles/progress-bar-in-rails
 - [ ] How to handle jobs that are divided into multiple sub-jobs
-- [ ] Remove jQuery dependency? ( ajax request using xmlhttp, promises )
 - [ ] WebSockets support
     - [ ] ActionCable support
 - [ ] Remove ActiveJob dependency ( support using Backends directly "Delayed Job", "Sidekiq", etc )
 - [ ] Remove Rails dependency
-- [ ] Config Inline Immortus::Job Strategy
-    - [ ] Change Router DSL to support specify verify url
