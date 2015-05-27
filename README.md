@@ -139,6 +139,8 @@ Immortus will use a strategy to keep track of the job status.
 
 Tracking strategy order is perJob/Immortus::Job config/ActiveJob QueueAdapter infer
 
+for more details check the [Tracking Strategies section](tracking_strategies.md)
+
 #### Inferred from ActiveJob queue adapter
 
 By default it will infer the strategy from the ActiveJob queue adapter ( config.active_job.adapter )
@@ -333,7 +335,7 @@ Credits
 ROADMAP
 ---
 
-0.1
+0.0.1
 
 - [x] Tests
 - [x] Routes DSL ( immortus_jobs )
