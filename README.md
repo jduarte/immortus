@@ -308,6 +308,8 @@ end
 
 for more details check the [Custom Tracking Strategies section](tracking_strategies.md#custom-strategy)
 
+To see detailed version check [Details section](details.md)
+
 Development
 ---
 
