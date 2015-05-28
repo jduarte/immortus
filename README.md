@@ -11,6 +11,10 @@ Immortus tracks ActiveJob job's status by employing a tracking strategy based on
 
 You can use one of our pre-implemented tracking strategy or create your own.
 
+Tracking strategies will persist data so we can know at all times the completeness (or more info) of the job.
+
+Current version uses Long Polling to verify job status.
+
 ### When should I use Immortus
 
 When you need to keep track of an async job.
@@ -47,7 +51,7 @@ And then execute:
 # config/routes.rb
 Rails.application.routes.draw do
   immortus_jobs do
-    post "generate_invoice", :to => "invoices#generate"
+    post 'generate_invoice', to: 'invoices#generate'
     # other routes to jobs may be added here
 
     # `immortus_jobs` will create under the hood
@@ -77,14 +81,14 @@ class InvoicesController < ApplicationController
 end
 ```
 
-##### include `Immortus::Job` in your `ActiveJob`
+##### include `Immortus::Job` in your `ActiveJob` or create a new ActiveJob
 
 ```ruby
 # app/jobs/generate_invoice_job.rb
 class GenerateInvoiceJob < ActiveJob::Base
   include Immortus::Job
 
-  def perform(record)
+  def perform(*args)
     # Generate invoices ...
   end
 end
@@ -102,17 +106,17 @@ Require Immortus in your manifest file ( make sure jQuery is included at this po
 To create and track an async job call in your JS:
 
 ```javascript
-var jobFinished = function(data) {
+var jobFinished = function (data) {
   // Job was completed here. `data` has the info returned in the `GenerateInvoicesController#verify`
   console.log(data.job_id + ' finished successfully.');
-}
+};
 
-var jobFailed = function(data) {
+var jobFailed = function (data) {
   console.log('error in job ' + data.job_id);
-}
+};
 
 Immortus.create('/generate_invoice')
-        .done(function(data) {
+        .done(function (data) {
           return Immortus.verify({ jobId: data.job_id })
                          .then(jobFinished, jobFailed);
         });
@@ -176,7 +180,7 @@ class GenerateInvoiceJob < ActiveJob::Base
 
   tracking_strategy :redis_pub_sub_strategy
 
-  def perform(record)
+  def perform(*args)
     # Generate invoices ...
   end
 end
@@ -340,8 +344,8 @@ ROADMAP
 
 - [x] Tests
 - [x] Routes DSL ( immortus_jobs )
-- [x] Immortus JS long polling
-- [x] default verify ( ImmortusController#verify )
+- [x] Immortus JS ( long polling )
+- [x] Default verify ( ImmortusController#verify )
 - [x] Tracking Strategies
     - [x] Delayed Job ( AR )
 
@@ -378,5 +382,5 @@ ROADMAP
 - [ ] How to handle jobs that are divided into multiple sub-jobs
 - [ ] WebSockets support
     - [ ] ActionCable support
-- [ ] Remove ActiveJob dependency ( support using Backends directly "Delayed Job", "Sidekiq", etc )
-- [ ] Remove Rails dependency
+- [ ] Consider remove ActiveJob dependency ( support using Backends directly "Delayed Job", "Sidekiq", etc )
+- [ ] Consider remove Rails dependency

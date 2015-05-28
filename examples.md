@@ -1,10 +1,8 @@
 Immortus Examples
 ===
 
-You can use Immortus in almost any case
+How to update percentage when we process a big image
 ---
-
-let's use it to update a percentage when we process a big image
 
 ##### Create job routes
 
