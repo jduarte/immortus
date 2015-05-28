@@ -11,7 +11,7 @@ Immortus tracks ActiveJob job's status by employing a tracking strategy based on
 
 You can use one of our pre-implemented tracking strategy or create your own.
 
-Currently Immortus uses Long Polling to verify job status.
+Currently `Immortus` uses Long Polling to verify job status.
 
 ### When should I use Immortus
 
@@ -205,7 +205,7 @@ Contributing
 Credits
 ---
 
-![Runtime Revolution](http://lh3.googleusercontent.com/-iRjFzclpFKg/AAAAAAAAAAI/AAAAAAAAABk/aVVbuMI11WA/s265-c-k-no/photo.jpg)
+![Runtime Revolution](https://avatars1.githubusercontent.com/u/60465?v=3&s=50)
 [Runtime Revolution](http://www.runtime-revolution.com/)
 
 ROADMAP
