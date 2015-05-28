@@ -124,16 +124,6 @@ end
 This example do __exactly__ the same as previous one.
 This should be used if we explicitly want to see what is going on or you need to add more info to __JS Create__ Callbacks
 
-JS
----
-
-Require Immortus in your manifest file ( make sure jQuery is included at this point ):
-
-```javascript
-//= ...
-//= require immortus
-```
-
 JS Create
 ---
 

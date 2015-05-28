@@ -111,16 +111,6 @@ class JobController < ApplicationController
 end
 ```
 
-JS
----
-
-Require Immortus in your manifest file ( make sure jQuery is included at this point ):
-
-```javascript
-//= ...
-//= require immortus
-```
-
 JS Create
 ---
 
