@@ -29,7 +29,7 @@ For example:
 - ActiveJob ( add `gem 'activejob_backport'` to Gemfile if 4.0 <= Rails < 4.2 )
 - jQuery
 
-### Installation
+#### Installation
 
 Add to your application's Gemfile:
 
@@ -43,93 +43,100 @@ And then execute:
 $ bundle
 ```
 
+### Tracking Strategy
 
+Immortus will use a tracking strategy to keep track of the job status.
 
+1. If the Job has defined an [Inline Tracking Strategy](./docs/tracking_strategies.md) it will use it.
+2. If not it will use the [User Global Configured](./docs/tracking_strategies.md) if defined
+3. Otherwise it will [inferred from the ActiveJob Queue Adapter](./docs/tracking_strategies.md)
 
+You can see how this work in more detail [here](./docs/tracking_strategies.md)
 
+### Example usage
 
+Let's say we want to:
 
-
-
-
-### Usage Example
-
-##### Create job routes
-
-```ruby
-# config/routes.rb
-Rails.application.routes.draw do
-  immortus_jobs do
-    post 'generate_invoice', to: 'invoices#generate'
-    # other routes to jobs may be added here
-
-    # `immortus_jobs` will create under the hood
-    #   get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify'
-    #   post '/generate_invoice', :to => 'invoices#generate'
-    #   other routes to jobs
-  end
-end
-```
-
-##### Controller
-
-```ruby
-# app/controllers/invoices_controller.rb
-class InvoicesController < ApplicationController
-  def generate
-    job = GenerateInvoiceJob.perform_later
-    render_immortus job
-
-    # `render_immortus` will create under the hood
-    #   if job.try('job_id')
-    #     render json: { job_id: job.job_id, job_class: job.class.name }
-    #   else
-    #     render json: {}, status: 500
-    #   end
-  end
-end
-```
-
-##### include `Immortus::Job` in your `ActiveJob` or create a new ActiveJob
-
-```ruby
-# app/jobs/generate_invoice_job.rb
-class GenerateInvoiceJob < ActiveJob::Base
-  include Immortus::Job
-
-  def perform(*args)
-    # Generate invoices ...
-  end
-end
-```
-
-##### Javascript
-
-Require Immortus in your manifest file ( make sure jQuery is included at this point ):
+* Create an Invoice by AJAX
+* Invoice will be created asynchronously because it's a long running task
+* Notify in the UI when that invoice was created.
 
 ```javascript
+// Require Immortus in your Manifest ( make sure jQuery is included at this point ):
+
 //= ...
 //= require immortus
 ```
 
-To create and track an async job call in your JS:
-
 ```javascript
-var jobFinished = function (data) {
-  // Job was completed here. `data` has the info returned in the `GenerateInvoicesController#verify`
-  console.log(data.job_id + ' finished successfully.');
-};
+$('.create-invoice-form').on('submit', function(e) {
+  e.preventDefault();
 
-var jobFailed = function (data) {
-  console.log('error in job ' + data.job_id);
-};
+  var jobFinished = function(data) { console.log(data.job_id + ' finished successfully.'); }
+  var jobFailed = function(data) { console.log('error in job ' + data.job_id); }
 
-Immortus.create('/generate_invoice')
-        .done(function (data) {
-          return Immortus.verify({ jobId: data.job_id })
-                         .then(jobFinished, jobFailed);
-        });
+  Immortus.create('/generate_invoice')
+          .done(function (data) {
+            return Immortus.verify({ jobId: data.job_id })
+                           .then(jobFinished, jobFailed);
+          });
+});
 ```
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  # Add the routes for the job creation and check status
+  immortus_jobs do
+    post 'generate_invoice', to: 'invoices#generate'
+  end
+end
+
+# app/controllers/invoices_controller.rb
+class InvoicesController < ApplicationController
+  def generate
+    job = GenerateInvoiceJob.perform_later
+    render_immortus(job)
+  end
+end
+
+# app/jobs/generate_invoice_job.rb
+class GenerateInvoiceJob < ActiveJob::Base
+  # Include Immortus::Job in your new or existing ActiveJob class
+  include Immortus::Job
+
+  def perform(*args)
+    # ...
+  end
+end
+```
+
+### Full documentation
+
+For a full documentation on how this works please check:
+
+* [Javascript](./docs/full.md#javascript)
+* [Routes](./docs/full.md#routes)
+* [Controller](./docs/full.md#controller)
+* [Immortus::Job](./docs/full.md#immortus_job)
+
+### Some more advanced examples
+
+By allowing [custom strategies](./docs/tracking_strategies.md#custom) and [custom verify controllers](./docs/full.md#controller) Immortus can be used for more complex work. Just a few examples:
+
+* [Track a job progress and update that progress in the UI](./docs/examples/job_progress.md)
+* TODO: Add more examples here
+
+
+
+
+
+
+
+
+
+----
+
 
 To only track an existing job without creating it:
 
@@ -138,123 +145,22 @@ Immortus.verify({ job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417' })
         .then(jobFinished, jobFailed);
 ```
 
-We use jQuery Promises (we can use .done or .fail instead of .then) for more details check [jQuery deferred API](http://api.jquery.com/category/deferred-object/)
 
-for all the options check the details in [Immortus JavaScript section](js.md)
 
-To see more examples check [Examples section](examples.md)
+----
 
-To see detailed version check [Details section](details.md)
 
-### Tracking Strategy
 
-Immortus will use a strategy to keep track of the job status.
 
-Tracking strategy order is perJob/Immortus::Job config/ActiveJob QueueAdapter infer
 
-for more details check the [Tracking Strategies section](tracking_strategies.md)
-
-#### Inferred from ActiveJob queue adapter
-
-By default it will infer the strategy from the ActiveJob queue adapter ( config.active_job.adapter )
-
-Here is a list of the ActiveJob queue adapter and its mapped strategies:
-
-| ActiveJob QueueAdapter |    Inferred Strategy    |                              Wiki                             |
-|-----------------------:|:-----------------------:|:-------------------------------------------------------------:|
-|           :delayed_job | :delayed\_job\_strategy | [How it works?](tracking_strategies.md#delayed-job-strategy)  |
-|            :backburner |           N/A           |                              N/A                              |
-|                    :qu |           N/A           |                              N/A                              |
-|                   :que |           N/A           |                              N/A                              |
-|         :queue_classic |           N/A           |                              N/A                              |
-|               :sidekiq |           N/A           |                              N/A                              |
-|              :sneakers |           N/A           |                              N/A                              |
-|          :sucker_punch |           N/A           |                              N/A                              |
-|                :inline |           N/A           |                              N/A                              |
-
-#### Override the default strategy
-
-```ruby
-# config/initializer/immortus.rb
-Immortus::Job.tracking_strategy = :redis_pub_sub_strategy
-```
-#### Define the tracking strategy per job
-
-By default all `Immortus::Job` subclasses will inherit the default tracking strategy but you can define it in a per job basis
-
-```ruby
-# app/jobs/generate_invoice_job.rb
-class GenerateInvoiceJob < ActiveJob::Base
-  include Immortus::Job
-
-  tracking_strategy :redis_pub_sub_strategy
-
-  def perform(*args)
-    # Generate invoices ...
-  end
-end
-```
-
-#### Define your own tracking strategy with default verify controller
-
-```ruby
-# app/jobs/tracking_strategy/my_custom_tracking_strategy.rb
-module TrackingStrategy
-  class MyCustomTrackingStrategy
-
-    def job_enqueued(job_id)
-      # Save in a custom table that this job was created
-      MyCustomTrackingJobTable.create!(job_id: job_id, status: 'created')
-    end
-
-    def job_started(job_id)
-      find(job_id).update_attributes(status: 'started')
-    end
-
-    def job_finished(job_id)
-      job = find(job_id)
-      job.update_attributes(status: 'finished')
-    end
-
-    # completed? method is mandatory, should return a boolean ( true if job is finished, false otherwise )
-    def completed?(job_id)
-      job = find(job_id)
-      job.status == 'finished'
-    end
-
-    # if meta method is defined, the returned hash will be added in every verify request
-    def meta(job_id)
-      job = find(job_id)
-
-      {
-        status: job.status
-      }
-    end
-
-    private
-
-    def find(job_id)
-      MyCustomTrackingJobTable.find_by(job_id: job_id)
-    end
-  end
-end
-
-# config/initializer/immortus.rb
-Immortus::Job.tracking_strategy = :my_custom_tracking_strategy
-# you could also specify the class directly:
-# Immortus::Job.tracking_strategy = TrackingStrategy::MyCustomTrackingStrategy
-```
-
-#### Define your own tracking strategy with custom verify controller
-
-you could define a custom controller to better fit your custom strategy
+-----
 
 ```ruby
 # config/routes.rb
 Rails.application.routes.draw do
-  # ...
-
-  get  "job_custom_verify/:job_id", :to => "job_custom_verify#verify"
+  immortus_jobs do
+    get  "job_custom_verify/:job_id", :to => "job_custom_verify#verify"
+  end
 end
 ```
 
@@ -275,54 +181,10 @@ class JobCustomVerifyController < ApplicationController
 end
 ```
 
-```ruby
-# app/jobs/tracking_strategy/job_custom_verify_strategy.rb
-module TrackingStrategy
-  class JobCustomVerifyStrategy
+------
 
-    def job_enqueued(job_id)
-      # Save in a custom table that this job was created
-      JobCustomVerifyTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
-    end
 
-    def job_started(job_id)
-      job = find(job_id)
-      job.update_attributes(status: 'running')
-    end
 
-    def job_finished(job_id)
-      job = find(job_id)
-      job.update_attributes(status: 'finished', percentage: 100)
-    end
-
-    def update_percentage(job_id, percentage)
-      job = find(job_id)
-      job.update_attributes(percentage: percentage)
-    end
-
-    def percentage(job_id)
-      job = find(job_id)
-      job.percentage
-    end
-
-    def completed?(job_id)
-      job = find(job_id)
-      job.status == 'finished'
-    end
-
-    private
-
-    def find(job_id)
-      JobCustomVerifyTable.find_by(job_id: job_id)
-    end
-
-  end
-end
-```
-
-for more details check the [Custom Tracking Strategies section](tracking_strategies.md#custom-strategy)
-
-To see detailed version check [Details section](details.md)
 
 Development
 ---
