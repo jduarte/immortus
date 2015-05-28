@@ -11,9 +11,7 @@ Immortus tracks ActiveJob job's status by employing a tracking strategy based on
 
 You can use one of our pre-implemented tracking strategy or create your own.
 
-Tracking strategies will persist data so we can know at all times the completeness (or more info) of the job.
-
-Current version uses Long Polling to verify job status.
+Currently `Immortus` uses Long Polling to verify job status.
 
 ### When should I use Immortus
 
@@ -96,7 +94,7 @@ end
 
 ##### Javascript
 
-Require Immortus in your manifest file ( make sure jQuery is included at this point ):
+Require `Immortus` in your manifest file ( make sure jQuery is included at this point ):
 
 ```javascript
 //= ...
@@ -107,7 +105,7 @@ To create and track an async job call in your JS:
 
 ```javascript
 var jobFinished = function (data) {
-  // Job was completed here. `data` has the info returned in the `GenerateInvoicesController#verify`
+  // Job was completed here.
   console.log(data.job_id + ' finished successfully.');
 };
 
@@ -116,7 +114,7 @@ var jobFailed = function (data) {
 };
 
 Immortus.create('/generate_invoice')
-        .done(function (data) {
+        .then(function (data) {
           return Immortus.verify({ jobId: data.job_id })
                          .then(jobFinished, jobFailed);
         });
@@ -135,11 +133,11 @@ for all the options check the details in [Immortus JavaScript section](js.md)
 
 To see more examples check [Examples section](examples.md)
 
-To see detailed version check [Details section](details.md)
+To see detailed version check [Details section](./docs/details.md)
 
 ### Tracking Strategy
 
-Immortus will use a strategy to keep track of the job status.
+`Immortus` will use a strategy to keep track of the job status.
 
 Tracking strategy order is perJob/Immortus::Job config/ActiveJob QueueAdapter infer
 
@@ -313,7 +311,7 @@ end
 
 for more details check the [Custom Tracking Strategies section](tracking_strategies.md#custom-strategy)
 
-To see detailed version check [Details section](details.md)
+To see detailed version check [Details section](./docs/details.md)
 
 Development
 ---
@@ -334,7 +332,7 @@ Contributing
 Credits
 ---
 
-![Runtime Revolution](http://lh3.googleusercontent.com/-iRjFzclpFKg/AAAAAAAAAAI/AAAAAAAAABk/aVVbuMI11WA/s265-c-k-no/photo.jpg)
+![Runtime Revolution](https://avatars1.githubusercontent.com/u/60465?v=3&s=200)
 [Runtime Revolution](http://www.runtime-revolution.com/)
 
 ROADMAP
