@@ -11,9 +11,7 @@ Immortus tracks ActiveJob job's status by employing a tracking strategy based on
 
 You can use one of our pre-implemented tracking strategy or create your own.
 
-Tracking strategies will persist data so we can know at all times the completeness (or more info) of the job.
-
-Current version uses Long Polling to verify job status.
+Currently Immortus uses Long Polling to verify job status.
 
 ### When should I use Immortus
 
@@ -41,7 +39,18 @@ gem 'immortus'
 
 And then execute:
 
-    $ bundle
+```
+$ bundle
+```
+
+
+
+
+
+
+
+
+
 
 ### Usage Example
 
