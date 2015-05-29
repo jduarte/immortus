@@ -68,17 +68,60 @@ end
 Immortus::Job
 ---
 
-### include Immortus::Job
+To give any ActiveJob the power of strategies just include `Immortus::Job`
 
-TODO
+```ruby
+# app/jobs/my_job.rb
+class MyJob < ActiveJob::Base
+  include Immortus::Job
 
-### tracking_strategy override
+  def perform(*args)
+    # ...
+  end
+end
+```
 
-TODO
+this way you could keep track of your job.
 
-### still an ActiveJob
+To override the strategy used in some job you can use tracking_strategy method
 
-TODO
+```ruby
+# app/jobs/my_job.rb
+class MyJob < ActiveJob::Base
+  include Immortus::Job
+
+  tracking_strategy :custom_tracking_strategy_to_my_job
+
+  def perform(*args)
+    # ...
+  end
+end
+```
+
+You can use all the functionality ActiveJob gives to you, like:
+
+```ruby
+class ProcessVideoJob < ActiveJob::Base
+  include Immortus::Job
+
+  queue_as do
+    video = self.arguments.first
+    if video.owner.premium?
+      :premium_videojobs
+    else
+      :videojobs
+    end
+  end
+
+  rescue_from(ActiveRecord::RecordNotFound) do |exception|
+    # Do something with the exception
+  end
+
+  def perform(video)
+    # Do process video
+  end
+end
+```
 
 JavaScript
 ---
