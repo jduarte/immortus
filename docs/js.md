@@ -1,16 +1,6 @@
 JavaScript
 ===
 
-Require Immortus JS
----
-
-Require Immortus in your manifest file ( make sure jQuery is included at this point ):
-
-```javascript
-//= ...
-//= require immortus
-```
-
 For next examples we are using this simple functions to illustrate what is going on
 
 ```javascript
