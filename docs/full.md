@@ -225,7 +225,7 @@ var jobInProgress = function(data) {
 ```javascript
 Immortus.create('/create_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
-        .done(function(jobInfo) {
+        .then(function(jobInfo) {
           return Immortus.verify(jobInfo, { longPolling: { interval: 800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });

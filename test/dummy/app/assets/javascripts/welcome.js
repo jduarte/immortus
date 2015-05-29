@@ -26,7 +26,7 @@ $(function() {
 
     Immortus.create($(this).attr('href'))
       .then(jobCreatedSuccessfully, jobFailedToCreate)
-      .done(function(jobInfo) {
+      .then(function(jobInfo) {
         return Immortus.verify(jobInfo, { longPolling: { interval: 1800 } })
                        .then(jobFinished, jobFailed, jobInProgress);
       });

@@ -72,13 +72,10 @@ Let's say we want to:
 $('.create-invoice-form').on('submit', function(e) {
   e.preventDefault();
 
-  var jobFinished = function(data) { console.log(data.job_id + ' finished successfully.'); }
-  var jobFailed = function(data) { console.log('error in job ' + data.job_id); }
-
   Immortus.create('/generate_invoice')
-          .done(function (data) {
-            return Immortus.verify({ job_id: data.job_id })
-                           .then(jobFinished, jobFailed);
+          .then(function (jobInfo) {
+            return Immortus.verify({ job_id: jobInfo.job_id })
+                           .then(function(data) { console.log(data.job_id + ' finished successfully.'); });
           });
 });
 ```
