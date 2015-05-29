@@ -4,9 +4,20 @@ Full Documentation
 Routes
 ---
 
-### immortus_jobs
+`Immortus` has a DSL route (immortus_jobs) so you can use __default verify__ and to help make your jobs code in same place.
 
-TODO
+It actually just add `get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify', as: :verify_immortus_job` to the top of the block given (if no block it just replace with same `get`)
+
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  immortus_jobs do
+    post  'create_a_job', to: 'job_creation#job'
+    post  'create_other_job', to: 'job_creation#other_job'
+  end
+end
+```
 
 Controller
 ---
@@ -15,33 +26,36 @@ Controller
 
 TODO
 
-### default verify
+### How default verify works?
 
 TODO
 
-### Custom verify
+### How to create a custom verify?
 
-you will need to add a `get` route
+you will need to add a `get` route, something like this:
 
 ```ruby
 # config/routes.rb
 Rails.application.routes.draw do
+  # ...
+
   immortus_jobs do
+    # ...
+
     get  "job_custom_verify/:job_id", :to => "job_custom_verify#verify"
   end
 end
 ```
 
-and create the controller method
+and create the controller method returning a JSON used in JavaScript (`data` argument).
+`completed` must be one of the returned keys, so JavaScript knows when to stop `Long Polling`
+so it should be true if job is finished.
 
 ```ruby
 # app/controllers/job_custom_verify_controller.rb
 class JobCustomVerifyController < ApplicationController
   def verify
     strategy = JobCustomVerify.strategy
-
-    # returned `json` will be available in `data` within JS callbacks
-    # `completed` should be one of returned `json` parameters
 
     render json: {
       :completed => strategy.completed?(params[:job_id]),
@@ -50,8 +64,6 @@ class JobCustomVerifyController < ApplicationController
   end
 end
 ```
-
-TODO: needs more text explaining
 
 Immortus::Job
 ---
