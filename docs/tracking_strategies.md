@@ -5,9 +5,9 @@ Tracking strategies are Ruby Objects that Immortus uses to track Job's status. I
 
 ## How configure which strategy should a job use?
 
-1. If the Job has defined an [Inline Tracking Strategy](./docs/tracking_strategies.md) it will use it.
-2. If not it will use the [User Global Configured](./docs/tracking_strategies.md) if defined
-3. Otherwise it will be [Inferred from the ActiveJob Queue Adapter](./docs/tracking_strategies.md)
+1. If the Job has defined an [Inline Tracking Strategy](#inline-tracking-strategy) it will use it.
+2. If not it will use the [User Global Configured](#user-global-configured) if defined
+3. Otherwise it will be [Inferred from the ActiveJob Queue Adapter](#inferred-from-the-activejob-queue-adapter)
 
 #### Inline Tracking Strategy
 
