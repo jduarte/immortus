@@ -4,27 +4,69 @@ Full Documentation
 Routes
 ---
 
-TODO
+### immortus_jobs
 
-* immortus_jobs
+TODO
 
 Controller
 ---
 
+### render_immortus
+
 TODO
 
-* render_immortus
-* default verify
-* custom verify
+### default verify
+
+TODO
+
+### Custom verify
+
+you will need to add a `get` route
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  immortus_jobs do
+    get  "job_custom_verify/:job_id", :to => "job_custom_verify#verify"
+  end
+end
+```
+
+and create the controller method
+
+```ruby
+# app/controllers/job_custom_verify_controller.rb
+class JobCustomVerifyController < ApplicationController
+  def verify
+    strategy = JobCustomVerify.strategy
+
+    # returned `json` will be available in `data` within JS callbacks
+    # `completed` should be one of returned `json` parameters
+
+    render json: {
+      :completed => strategy.completed?(params[:job_id]),
+      :percentage => strategy.percentage(params[:job_id])
+    }
+  end
+end
+```
+
+TODO: needs more text explaining
 
 Immortus::Job
 ---
 
+### include Immortus::Job
+
 TODO
 
-* include Immortus::Job
-* tracking_strategy override
-* still an ActiveJob
+### tracking_strategy override
+
+TODO
+
+### still an ActiveJob
+
+TODO
 
 JavaScript
 ---
