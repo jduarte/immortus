@@ -8,7 +8,7 @@ var Immortus = (function () {
   api.verify = function (jobOptions, options) {
     var defer = $.Deferred();
     var timeout = (options && options.longPolling && options.longPolling.interval) || 500;
-    var url = jobOptions.verifyJobUrl;
+    var url = jobOptions.verify_job_url;
     var verifyCall, successFn, failFn;
 
     if (!url) {

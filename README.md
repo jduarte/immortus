@@ -7,7 +7,7 @@ Immortus
 
 ### What Immortus do?
 
-Immortus tracks ActiveJob job's status by employing a tracking strategy based on ActiveJob callbacks and lets you handle it on your UI through Javascript.
+`Immortus` tracks ActiveJob job's status by employing a tracking strategy based on ActiveJob callbacks and lets you handle it on your UI through Javascript.
 
 You can use one of our pre-implemented tracking strategy or create your own.
 

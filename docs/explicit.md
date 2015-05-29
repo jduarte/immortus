@@ -1,6 +1,12 @@
 Explicit Immortus Details
 ===
 
+In this example we assume:
+
+- you will create a new background job
+- you need an extra field to be displayed (percentage)
+- you may have more then one strategy configured globally
+
 Routes (file: config/routes.rb)
 ---
 
@@ -16,25 +22,6 @@ end
 This should be used if we explicitly want to see what is going on or if we don't need __default verify__ (case presented).
 
 In this case we also need the custom verify, defined in __Verify job method__ section
-
-Job
----
-
-Just add `include Immortus::Job` into your ActiveJob. Example:
-
-```ruby
-# app/jobs/generate_invoice_job.rb
-class MyJob < ActiveJob::Base
-  include Immortus::Job
-
-  tracking_strategy :job_custom_verify_strategy
-
-  def perform(record)
-    # Do stuff ...
-    # self.strategy.update_percentage(job_id, percentage)
-  end
-end
-```
 
 Tracking Strategy
 ---
@@ -80,6 +67,25 @@ module TrackingStrategy
       JobCustomVerifyTable.find_by(job_id: job_id)
     end
 
+  end
+end
+```
+
+Job
+---
+
+Just add `include Immortus::Job` into your ActiveJob. Example:
+
+```ruby
+# app/jobs/my_job.rb
+class MyJob < ActiveJob::Base
+  include Immortus::Job
+
+  tracking_strategy :job_custom_verify_strategy
+
+  def perform(record)
+    # Do stuff ...
+    # self.strategy.update_percentage(job_id, percentage)
   end
 end
 ```
@@ -131,7 +137,7 @@ JS Create
 var jobCreatedSuccessfully = function(data) {
   // logic to add some loading gif
 
-  return { job_id: data.job_id, job_class: data.job_class };
+  return { job_id: data.job_id };
 };
 
 var jobFailedToCreate = function() {
@@ -153,8 +159,8 @@ var jobInProgress = function(data) {
 Immortus.create('/process_image')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobInfo) {
-          jobInfo.verifyJobUrl = '/job_custom_verify/908ec6f1-e093-4943-b7a8-7c84eccfe417';
-          return Immortus.verify(jobInfo, { longPolling: { interval: 1800 } })
+          var verifyJobUrl = '/job_custom_verify/' + jobInfo.job_id;
+          return Immortus.verify({ verify_job_url: verifyJobUrl }, { longPolling: { interval: 1800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 ```
@@ -179,7 +185,7 @@ var jobInProgress = function(data) {
 };
 
 var jobInfo = {
-  verifyJobUrl: '/job_custom_verify/908ec6f1-e093-4943-b7a8-7c84eccfe417'
+  verify_job_url: '/job_custom_verify/908ec6f1-e093-4943-b7a8-7c84eccfe417'
 };
 
 var options = {

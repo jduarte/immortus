@@ -18,12 +18,12 @@ var jobCreatedSuccessfully = function(data) {
   // Executed when `create job` AJAX request returns with a 2xx status code
   console.log('Job ' + data.job_id + ' created successfully');
 
-  // We must return here the `job_id` or `verifyJobUrl` in order for the `verify` function receive this argument.
-  // We also must return the `job_class` if using more then 1 strategy in application and `verifyJobUrl` is not sent.
+  // We must return here the `job_id` or `verify_job_url` in order for the `verify` function receive this argument.
+  // We also must return the `job_class` if using more then 1 strategy in application and `verify_job_url` is not sent.
   // ex.:
   // return { job_id: data.job_id, job_class: data.job_class }
   // or
-  // return { verifyJobUrl: '/my_custom_verify_route/' + data.job_id }
+  // return { verify_job_url: '/my_custom_verify_route/' + data.job_id }
   // since data by default has all we need we are returning it
   return data;
 }
@@ -90,11 +90,11 @@ var jobInfo = {
   jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
   // JobClass is needed if more than 1 strategy is used, otherwise can be ignored
   jobClass: 'job_class',
-  // if we want to use a custom verify route & controller we could set verifyJobUrl
+  // if we want to use a custom verify route & controller we could set verify_job_url
   // this will override default controller so `jobClass` will be ignored
   // (unless you use it in your custom controller),
-  // i.e. if verifyJobUrl is defined it will ignore `jobId` and `jobClass`
-  verifyJobUrl: '/custom_verify_path/with_job_id'
+  // i.e. if verify_job_url is defined it will ignore `jobId` and `jobClass`
+  verify_job_url: '/custom_verify_path/with_job_id'
 };
 
 var options = {

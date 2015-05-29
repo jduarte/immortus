@@ -1,8 +1,11 @@
 Intermediate Immortus Details
 ===
 
-We assume you will create a new background job with an extra field (percentage)
+In this example we assume:
 
+- you will create a new background job
+- you need an extra field to be displayed (percentage)
+- you may have more then one strategy configured globally
 
 Routes (file: config/routes.rb)
 ---
@@ -79,7 +82,7 @@ Job
 Just add `include Immortus::Job` into your ActiveJob. Example:
 
 ```ruby
-# app/jobs/generate_invoice_job.rb
+# app/jobs/my_job.rb
 class MyJob < ActiveJob::Base
   include Immortus::Job
 

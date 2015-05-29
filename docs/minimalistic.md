@@ -1,7 +1,11 @@
 Minimalistic Immortus Details
 ===
 
-We assume you already have jobs created and just need to know when they finish and just want to change the minimum possible
+In this example we assume:
+
+- you already have jobs created and just need to know when they finish
+- you just want to change the minimum code possible
+- you only have one strategy configured globally
 
 Routes (file: config/routes.rb)
 ---
@@ -23,7 +27,7 @@ Job
 Just add `include Immortus::Job` into your ActiveJob. Example:
 
 ```ruby
-# app/jobs/generate_invoice_job.rb
+# app/jobs/my_job.rb
 class MyJob < ActiveJob::Base
   include Immortus::Job
 
