@@ -47,9 +47,9 @@ $ bundle
 
 Immortus will use a tracking strategy to keep track of the job status.
 
-1. If the Job has defined an [Inline Tracking Strategy](./docs/tracking_strategies.md) it will use it.
-2. If not it will use the [User Global Configured](./docs/tracking_strategies.md) if defined
-3. Otherwise it will [inferred from the ActiveJob Queue Adapter](./docs/tracking_strategies.md)
+1. If the Job has defined an [Inline Tracking Strategy](./docs/tracking_strategies.md#inline-tracking-strategy) it will use it.
+2. If not it will use the [User Global Configured](./docs/tracking_strategies.md#user-global-configured) if defined
+3. Otherwise it will [inferred from the ActiveJob Queue Adapter](./docs/tracking_strategies.md#inferred-from-the-activejob-queue-adapter)
 
 You can see how this work in more detail [here](./docs/tracking_strategies.md)
 
@@ -118,7 +118,7 @@ For a full documentation on how this works please check:
 * [Javascript](./docs/full.md#javascript)
 * [Routes](./docs/full.md#routes)
 * [Controller](./docs/full.md#controller)
-* [Immortus::Job](./docs/full.md#immortus_job)
+* [Immortus::Job](./docs/full.md#immortus-job)
 
 ### Some more advanced examples
 
