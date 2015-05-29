@@ -1,7 +1,35 @@
-JavaScript
+Full Documentation
 ===
 
-For next examples we are using this simple functions to illustrate what is going on
+Routes
+---
+
+TODO
+
+* immortus_jobs
+
+Controller
+---
+
+TODO
+
+* render_immortus
+* default verify
+* custom verify
+
+Immortus::Job
+---
+
+TODO
+
+* include Immortus::Job
+* tracking_strategy override
+* still an ActiveJob
+
+JavaScript
+---
+
+For all JS code snippets we are using this functions to illustrate what is going on
 
 ```javascript
 var jobCreatedSuccessfully = function(data) {
@@ -38,7 +66,7 @@ var jobFailed = function(data) {
 
 var jobInProgress = function(data) {
   // Executed every `verify job` AJAX request
-  // each `longPolling.interval` milliseconds (defaults to 500) after last success
+  // it is called each `longPolling.interval` milliseconds (defaults to 500) after last success, until completed or failed
   console.log('Job ' + data.job_id + ' is still executing ...');
 }
 ```
