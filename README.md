@@ -1,7 +1,7 @@
 Immortus
 ===
 
-![Immortus](./docs/immortus.jpg)
+![Immortus](./docs/Immortus.jpg)
 
 > The ruler of Limbo, Immortus bartered with the near-omnipotent Time-Keepers for immortality, in exchange becoming their agent in preserving timelines at all costs, no matter how many lives get disrupted, ruined, or erased.
 
