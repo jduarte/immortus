@@ -9,9 +9,9 @@ Immortus
 
 `Immortus` tracks ActiveJob job's status by employing a tracking strategy based on ActiveJob callbacks and lets you handle it on your UI through Javascript.
 
-You can use one of our pre-implemented tracking strategy or create your own.
+You can use one of our pre-implemented tracking strategies or create your own.
 
-Currently `Immortus` uses Long Polling to verify job status.
+Currently `Immortus` uses Long Polling to verify job status. Web Sockets support is on the [ROADMAP](./docs/ROADMAP.md).
 
 ### When should I use Immortus
 
@@ -205,56 +205,12 @@ Contributing
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
-Credits
+License
 ---
+
+Copyright Runtime Revolution. http://www.runtime-revolution.com
+
+You are not granted rights or licenses to the trademarks of Runtime Revolution
 
 ![Runtime Revolution](https://avatars1.githubusercontent.com/u/60465?v=3&s=50)
 [Runtime Revolution](http://www.runtime-revolution.com/)
-
-ROADMAP
----
-
-#### 0.0.1
-
-- [x] Tests
-- [x] Routes DSL ( immortus_jobs )
-- [x] Immortus JS ( long polling )
-- [x] Default verify ( ImmortusController#verify )
-- [x] Tracking Strategies
-    - [x] Delayed Job ( AR )
-
-#### Soon
-
-- [ ] Setup testing environment to work with different Ruby versions and Rails versions
-- [ ] Tests
-    - [ ] Tracking Strategies
-        - [ ] Backburner
-        - [ ] Qu
-        - [ ] Que
-        - [ ] queue_classic
-        - [ ] Resque
-        - [ ] Sidekiq
-        - [ ] Sneakers
-        - [ ] Sucker Punch
-        - [ ] Active Job Inline
-- [ ] Tracking Strategies
-    - [ ] Backburner
-    - [ ] Qu
-    - [ ] Que
-    - [ ] queue_classic
-    - [ ] Resque
-    - [ ] Sidekiq
-    - [ ] Sneakers
-    - [ ] Sucker Punch
-    - [ ] Active Job Inline
-- [ ] Ensure JS callbacks `data` is available
-- [ ] LOGS
-
-#### Future Developments
-
-- [ ] Error handling: http://www.sitepoint.com/dont-get-activejob/
-- [ ] How to handle jobs that are divided into multiple sub-jobs
-- [ ] WebSockets support
-    - [ ] ActionCable support
-- [ ] Consider remove ActiveJob dependency ( support using Backends directly "Delayed Job", "Sidekiq", etc )
-- [ ] Consider remove Rails dependency
