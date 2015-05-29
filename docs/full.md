@@ -1,4 +1,4 @@
-Full Documentation
+Documentation
 ===
 
 Routes
@@ -22,15 +22,67 @@ end
 Controller
 ---
 
-### render_immortus
+### Create Job
 
-TODO
+`Immortus` has a render (`render_immortus(job)`) that help you send needed data to `Immortus.create` JS callbacks
 
-### How default verify works?
+```ruby
+# app/controllers/sample_controller.rb
+class SampleController < ApplicationController
+  def generate_job
+    job = MyJob.perform_later
+    render_immortus(job)
+  end
+end
+```
 
-TODO
+To this to work you need to use ActiveJob `perform_later` method, otherwise it will not generate a job_id.
 
-### How to create a custom verify?
+`render_immortus` sends `job_id` and `job_class` to `Immortus.create` JS callbacks. It's the same as write:
+
+```ruby
+if job.try('job_id')
+  render json: { job_id: job.job_id, job_class: job.class.name }
+else
+  render json: {}, status: 500
+end
+```
+
+### Verify
+
+##### How default verify works?
+
+__default verify__ is a simple verify method `Immortus` bring to you due to convenience.
+
+It send `completed` to SJ if verify successfully run, i.e. strategy returns without error.
+It always send `job_id` to JS even if it fails to verify the job.
+
+It also works with job in-line tracking strategy override if you also send `job_class` in `Immortus.verify` JS call.
+
+It has the ability to send extra fields to JS, you just need to define the method `meta(job_id)` in your strategy and return a hash with the extra fields you want.
+If you want to add the field percentage you could do something like:
+
+```ruby
+# app/jobs/tracking_strategy/some_custom_strategy.rb
+module TrackingStrategy
+  class SomeCustomStrategy
+    # ...
+
+    def meta(job_id)
+      job = SomeTable.find_by(job_id: job_id)
+
+      {
+        percentage: job.percentage
+      }
+    end
+
+  end
+end
+```
+
+you could also create your own custom verify
+
+##### How to create a custom verify?
 
 you will need to add a `get` route, something like this:
 
@@ -202,9 +254,9 @@ Immortus.create('/create_job')
 
 var jobInfo = {
   // jobId is recommended to be set
-  jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
+  job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
   // JobClass is needed if more than 1 strategy is used, otherwise can be ignored
-  jobClass: 'job_class',
+  job_class: 'job_class',
   // if we want to use a custom verify route & controller we could set verify_job_url
   // this will override default controller so `jobClass` will be ignored
   // (unless you use it in your custom controller),
