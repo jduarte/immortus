@@ -122,12 +122,12 @@ For a full documentation on how this works please check:
 
 ### Some more advanced examples
 
-By allowing [custom strategies](./docs/tracking_strategies.md#custom) and [custom verify controllers](./docs/full.md#controller) Immortus can be used for more complex work. Just a few examples:
+By allowing [custom strategies](./docs/tracking_strategies.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify) Immortus can be used for more complex work. Just a few examples:
 
-* [Track a job progress and update percentage in the UI](./docs/examples/job_progress.md)
 * [Minimalistic](./docs/examples/minimalistic.md) ( more syntactic sugar / hidden behavior ) - we assume you already have jobs created and just need to know when they finish and just want to change the minimum possible
 * [Intermediate](./docs/examples/intermediate.md) - we assume you will create a new background job with an extra field (percentage)
 * [Explicit](./docs/examples/explicit.md) ( clear as water ) - have full control on what is going on doing the same as Intermediate way
+* [Track a job progress and update percentage in the UI](./docs/examples/job_progress.md)
 * TODO: Add more examples here
 
 Development
