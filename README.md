@@ -149,7 +149,7 @@ Contributing
 License
 ---
 
-Copyright &copy; 2015 [Runtime Revolution](http://www.runtime-revolution.com/), released under the MIT license.
+Copyright © 2015 [Runtime Revolution](http://www.runtime-revolution.com/), released under the MIT license.
 
 You are not granted rights or licenses to the trademarks of Runtime Revolution
 
