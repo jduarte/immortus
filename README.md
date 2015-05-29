@@ -149,9 +149,8 @@ Contributing
 License
 ---
 
-Copyright Runtime Revolution. http://www.runtime-revolution.com
+Copyright © 2015 [Runtime Revolution](http://www.runtime-revolution.com/), released under the MIT license.
 
 You are not granted rights or licenses to the trademarks of Runtime Revolution
 
-![Runtime Revolution](https://avatars1.githubusercontent.com/u/60465?v=3&s=50)
-[Runtime Revolution](http://www.runtime-revolution.com/)
+[![Runtime Revolution](./docs/runtime-revolution-logo.png)](http://www.runtime-revolution.com/)
