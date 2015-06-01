@@ -35,6 +35,14 @@ var Immortus = (function () {
 
     // function(jqXHR, textStatus, errorThrown)
     failFn = function (jqXHR) {
+      if (jqXHR.status === 0) {
+        if (window.console && window.console.log) {
+          console.log('empty response');
+        }
+
+        return false;
+      }
+
       defer.reject(jqXHR.responseJSON || {});
     };
 
