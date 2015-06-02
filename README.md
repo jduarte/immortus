@@ -62,6 +62,7 @@ $ bundle
 # config/routes.rb
 Rails.application.routes.draw do
   # Add the routes for check status
+  # this is usually used with a block containing all job creation routes
   immortus_jobs
 end
 ```
