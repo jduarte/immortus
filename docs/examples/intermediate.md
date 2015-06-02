@@ -163,7 +163,7 @@ var jobInfo = {
 };
 
 var options = {
-  longPolling: {
+  long_polling: {
     interval: 800
   }
 };

@@ -215,7 +215,7 @@ var jobFailed = function(data) {
 
 var jobInProgress = function(data) {
   // Executed every `verify job` AJAX request
-  // it is called each `longPolling.interval` milliseconds (defaults to 500) after last success, until completed or failed
+  // it is called each `long_polling.interval` milliseconds (defaults to 500) after last success, until completed or failed
   console.log('Job ' + data.job_id + ' is still executing ...');
 }
 ```
@@ -226,7 +226,7 @@ var jobInProgress = function(data) {
 Immortus.create('/create_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobInfo) {
-          return Immortus.verify(jobInfo, { longPolling: { interval: 800 } })
+          return Immortus.verify(jobInfo, { long_polling: { interval: 800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 
@@ -265,8 +265,8 @@ var jobInfo = {
 };
 
 var options = {
-  // currently we only support longPolling
-  longPolling: {
+  // currently we only support long polling
+  long_polling: {
     // `interval` is the minimum wait time in millisconds from last success request (default is 500)
     // i.e. if server responds in 200ms and we set `interval` to 800
     //      we get a new request in server every second (aprox.)

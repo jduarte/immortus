@@ -160,7 +160,7 @@ Immortus.create('/process_image')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobInfo) {
           var verifyJobUrl = '/job_custom_verify/' + jobInfo.job_id;
-          return Immortus.verify({ verify_job_url: verifyJobUrl }, { longPolling: { interval: 1800 } })
+          return Immortus.verify({ verify_job_url: verifyJobUrl }, { long_polling: { interval: 1800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 ```
@@ -189,7 +189,7 @@ var jobInfo = {
 };
 
 var options = {
-  longPolling: {
+  long_polling: {
     interval: 800
   }
 };
