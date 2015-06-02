@@ -4,10 +4,9 @@ Documentation
 Routes
 ---
 
-`Immortus` has a DSL route (immortus_jobs) so you can use __default verify__ and to help make your jobs code in same place.
+`Immortus` has a DSL route (`immortus_jobs`) so you can use __default verify__ and to help make your jobs code in same place.
 
 It actually just add `get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify', as: :verify_immortus_job` to the top of the block given (if no block it just replace with same `get`)
-
 
 ```ruby
 # config/routes.rb
@@ -24,12 +23,14 @@ Rails.application.routes.draw do
 end
 ```
 
+The use of `immortus_jobs` is not mandatory but is recommended to be sure we can use __default verify__.
+
 Controller
 ---
 
 ### Create Job
 
-`Immortus` has a render (`render_immortus(job)`) that help you send needed data to `Immortus.create` JS callbacks
+`Immortus` has a render (`render_immortus(job)`) that help you send needed data to `Immortus.create` JS callback
 
 ```ruby
 # app/controllers/sample_controller.rb
@@ -43,7 +44,8 @@ end
 
 To this to work you need to use ActiveJob `perform_later` method, otherwise it will not generate a job_id.
 
-`render_immortus` sends `job_id` and `job_class` to `Immortus.create` JS callbacks. It's the same as write:
+`render_immortus` sends `job_id` and `job_class` to `Immortus.create` JS callbacks.
+`render_immortus(job)` is the same as write:
 
 ```ruby
 if job.try('job_id')
@@ -55,14 +57,14 @@ end
 
 ### Verify
 
-##### How default verify works?
+##### How does default verify works?
 
 __default verify__ is a simple verify method `Immortus` bring to you due to convenience.
 
 It send `completed` to SJ if verify successfully run, i.e. strategy returns without error.
 It always send `job_id` to JS even if it fails to verify the job.
 
-It also works with job in-line tracking strategy override if you also send `job_class` in `Immortus.verify` JS call.
+It also works with job [Inline Tracking Strategy](tracking_strategies.md#inline-tracking-strategy) override if you also send `job_class` in `Immortus.verify` JS call.
 
 It has the ability to send extra fields to JS, you just need to define the method `meta(job_id)` in your strategy and return a hash with the extra fields you want.
 If you want to add the field percentage you could do something like:

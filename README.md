@@ -58,6 +58,14 @@ $ bundle
 //= require immortus
 ```
 
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  # Add the routes for check status
+  immortus_jobs
+end
+```
+
 ### Example usage
 
 ##### track a job
@@ -75,12 +83,6 @@ $('.js-track-invoice').each(function() {
 ```
 
 ```ruby
-# config/routes.rb
-Rails.application.routes.draw do
-  # Add the routes for check status
-  immortus_jobs
-end
-
 # app/jobs/generate_invoice_job.rb
 class GenerateInvoiceJob < ActiveJob::Base
   # Include Immortus::Job in your new or existing ActiveJob class
@@ -113,7 +115,7 @@ $('.js-create-invoice').click(function() {
 ```ruby
 # config/routes.rb
 Rails.application.routes.draw do
-  # Add the routes for the job creation and check status
+  # Change routes DSL to receive a block for the job creation
   immortus_jobs do
     post 'generate_invoice', to: 'invoices#generate'
   end
