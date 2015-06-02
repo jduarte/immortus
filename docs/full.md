@@ -16,6 +16,11 @@ Rails.application.routes.draw do
     post  'create_a_job', to: 'job_creation#job'
     post  'create_other_job', to: 'job_creation#other_job'
   end
+
+  # this is the same as doing:
+  # get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify', as: :verify_immortus_job
+  # post 'create_a_job', to: 'job_creation#job'
+  # post 'create_other_job', to: 'job_creation#other_job'
 end
 ```
 

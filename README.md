@@ -5,11 +5,9 @@ Immortus
 
 > The ruler of Limbo, Immortus bartered with the near-omnipotent Time-Keepers for immortality, in exchange becoming their agent in preserving timelines at all costs, no matter how many lives get disrupted, ruined, or erased.
 
-### What Immortus do?
+### What does Immortus do
 
-`Immortus` tracks ActiveJob job's status by employing a tracking strategy based on ActiveJob callbacks and lets you handle it on your UI through Javascript.
-
-You can use one of our pre-implemented tracking strategies or create your own.
+`Immortus` tracks ActiveJob jobs statuses and lets you handle them on your UI through Javascript callbacks.
 
 Currently `Immortus` uses Long Polling to verify job status. Web Sockets support is on the [ROADMAP](./docs/ROADMAP.md).
 
@@ -22,6 +20,14 @@ For example:
 - upload / process an image
 - import / export files ( .xls, .csv, ... )
 - etc.
+
+### How does Immortus work
+
+`Immortus` will use a tracking strategy, based on ActiveJob callbacks, to keep track of the jobs statuses.
+
+By default, tracking strategy will be inferred from ActiveJob Queue Adapter, but we know that you may need more complexity so we let you create your own!
+
+You can see how tracking strategies work in more detail [here](./docs/tracking_strategies.md)
 
 ### Requirements
 
@@ -43,23 +49,7 @@ And then execute:
 $ bundle
 ```
 
-### Tracking Strategy
-
-Immortus will use a tracking strategy to keep track of the job status.
-
-1. If the Job has defined an [Inline Tracking Strategy](./docs/tracking_strategies.md#inline-tracking-strategy) it will use it.
-2. If not it will use the [User Global Configured](./docs/tracking_strategies.md#user-global-configured) if defined
-3. Otherwise it will [inferred from the ActiveJob Queue Adapter](./docs/tracking_strategies.md#inferred-from-the-activejob-queue-adapter)
-
-You can see how this work in more detail [here](./docs/tracking_strategies.md)
-
-### Example usage
-
-Let's say we want to:
-
-* Create an Invoice by AJAX
-* Invoice will be created asynchronously because it's a long running task
-* Notify in the UI when that invoice was created.
+#### Setup
 
 ```javascript
 // Require Immortus in your Manifest ( make sure jQuery is included at this point ):
@@ -68,10 +58,50 @@ Let's say we want to:
 //= require immortus
 ```
 
-```javascript
-$('.create-invoice-form').on('submit', function(e) {
-  e.preventDefault();
+### Example usage
 
+##### track a job
+
+Let's say we want to:
+
+* Track an Invoice job (job is already created somewhere in your code)
+* Notify in the UI when that invoice was created
+
+```javascript
+$('.js-track-invoice').each(function() {
+  Immortus.verify({ job_id: $(this).data('job-id') })
+          .then(function(data) { console.log(data.job_id + ' finished successfully.'); });
+});
+```
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  # Add the routes for check status
+  immortus_jobs
+end
+
+# app/jobs/generate_invoice_job.rb
+class GenerateInvoiceJob < ActiveJob::Base
+  # Include Immortus::Job in your new or existing ActiveJob class
+  include Immortus::Job
+
+  def perform(*args)
+    # ...
+  end
+end
+```
+
+##### create and track a job
+
+Let's say we want to:
+
+* Create an Invoice by AJAX
+* Invoice will be created asynchronously because it's a long running task
+* Notify in the UI when that invoice was created
+
+```javascript
+$('.js-create-invoice').click(function() {
   Immortus.create('/generate_invoice')
           .then(function (jobInfo) {
             return Immortus.verify({ job_id: jobInfo.job_id })
@@ -121,9 +151,8 @@ For a full documentation on how this works please check:
 
 By allowing [custom strategies](./docs/tracking_strategies.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify) Immortus can be used for more complex work. Just a few examples:
 
-* [Minimalistic](./docs/examples/minimalistic.md) ( more syntactic sugar / hidden behavior ) - we assume you already have jobs created and just need to know when they finish and just want to change the minimum possible
-* [Intermediate](./docs/examples/intermediate.md) - we assume you will create a new background job with an extra field (percentage)
-* [Explicit](./docs/examples/explicit.md) ( clear as water ) - have full control on what is going on doing the same as Intermediate way
+* [Create a Job and track progress](./docs/examples/intermediate.md)
+* [Create a Job and track progress with custom verify](./docs/examples/explicit.md)
 * [Track a job progress and update percentage in the UI](./docs/examples/job_progress.md)
 * TODO: Add more examples here
 

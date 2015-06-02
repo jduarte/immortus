@@ -1,4 +1,4 @@
-Immortus example
+Track a job progress and update percentage in the UI
 ===
 
 How to update percentage when we process a big image

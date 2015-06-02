@@ -1,9 +1,9 @@
 Tracking Strategies
 ===
 
-Tracking strategies are Ruby Objects that Immortus uses to track Job's status. It will use an available tracking strategy in the following order:
-
 ## How configure which strategy should a job use?
+
+Tracking strategies are Ruby Objects that `Immortus` uses to track Jobs statuses. It will use an available tracking strategy in the following order:
 
 1. If the Job has defined an [Inline Tracking Strategy](#inline-tracking-strategy) it will use it.
 2. If not it will use the [User Global Configured](#user-global-configured) if defined
