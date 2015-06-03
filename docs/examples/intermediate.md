@@ -121,7 +121,7 @@ var jobInProgress = function(data) {
   // logic to update percentage with `data.percentage` ... which came from meta method
 };
 
-Immortus.create('/generate_invoice')
+Immortus.create('/process_image')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobInfo) {
           return Immortus.verify(jobInfo)
