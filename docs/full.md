@@ -311,7 +311,7 @@ class ProcessVideoJob < ActiveJob::Base
 end
 ```
 
-JavaScript
+Immortus JavaScript
 ---
 
 For all JavaScript code snippets we are using this functions to illustrate what is going on

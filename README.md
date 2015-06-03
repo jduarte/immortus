@@ -141,10 +141,11 @@ Full documentation
 
 For a full documentation on how this works please check:
 
-* [JavaScript](./docs/full.md#javascript)
 * [Routes](./docs/full.md#routes)
 * [Controller](./docs/full.md#controller)
+* [Tracking Strategies](./docs/full.md#tracking-strategy)
 * [Immortus::Job](./docs/full.md#immortus-job)
+* [Immortus JavaScript](./docs/full.md#immortus-javascript)
 
 Some more advanced examples
 ---
@@ -152,7 +153,7 @@ Some more advanced examples
 `Immortus` can be used for more complex work by allowing [custom strategies](./docs/full.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify). Just a few examples:
 
 * [Create a Job and track progress](./docs/examples/intermediate.md)
-* [Create a Job and track progress with custom verify](./docs/examples/explicit.md)
+* [Create a Job to send emails and track his progress ( with a custom verify )](./docs/examples/explicit.md)
 * [Track a job progress and update percentage in the UI](./docs/examples/job_progress.md)
 * TODO: Add more examples here
 
