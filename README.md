@@ -27,7 +27,7 @@ For example:
 
 By default, tracking strategy will be inferred from ActiveJob Queue Adapter, but we know that you may need more complexity so we let you create your own!
 
-You can see how tracking strategies work in more detail [here](./docs/tracking_strategies.md)
+You can see how tracking strategies work in more detail [here](./docs/full.md#tracking-strategy)
 
 ### Requirements
 
@@ -35,7 +35,7 @@ You can see how tracking strategies work in more detail [here](./docs/tracking_s
 - ActiveJob ( add `gem 'activejob_backport'` to Gemfile if 4.0 <= Rails < 4.2 )
 - jQuery
 
-#### Installation
+### Installation
 
 Add to your application's Gemfile:
 
@@ -49,7 +49,9 @@ And then execute:
 $ bundle
 ```
 
-#### Setup
+### Example usage
+
+##### Setup
 
 ```javascript
 // Require Immortus in your Manifest ( make sure jQuery is included at this point ):
@@ -61,20 +63,13 @@ $ bundle
 ```ruby
 # config/routes.rb
 Rails.application.routes.draw do
-  # Add the routes for check status
+  # Add the route to default verify
   # this is usually used with a block containing all job creation routes
   immortus_jobs
 end
 ```
 
-### Example usage
-
-##### track a job
-
-Let's say we want to:
-
-* Track an Invoice job (job is already created somewhere in your code)
-* Notify in the UI when that invoice was created
+##### Track an Invoice job and then notify the UI when finished
 
 ```javascript
 $('.js-track-invoice').each(function() {
@@ -95,13 +90,7 @@ class GenerateInvoiceJob < ActiveJob::Base
 end
 ```
 
-##### create and track a job
-
-Let's say we want to:
-
-* Create an Invoice by AJAX
-* Invoice will be created asynchronously because it's a long running task
-* Notify in the UI when that invoice was created
+##### Create an Invoice job and then notify the UI when finished
 
 ```javascript
 $('.js-create-invoice').click(function() {
@@ -152,7 +141,7 @@ For a full documentation on how this works please check:
 
 ### Some more advanced examples
 
-By allowing [custom strategies](./docs/tracking_strategies.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify) `Immortus` can be used for more complex work. Just a few examples:
+By allowing [custom strategies](./docs/full.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify) `Immortus` can be used for more complex work. Just a few examples:
 
 * [Create a Job and track progress](./docs/examples/intermediate.md)
 * [Create a Job and track progress with custom verify](./docs/examples/explicit.md)

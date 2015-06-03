@@ -6,24 +6,22 @@ Routes
 
 `Immortus` has a DSL route (`immortus_jobs`) so you can use __default verify__ and to help make your jobs code in same place.
 
-It actually just add `get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify', as: :verify_immortus_job` to the top of the block given (if no block it just replace with same `get`)
-
 ```ruby
 # config/routes.rb
 Rails.application.routes.draw do
   immortus_jobs do
-    post  'create_a_job', to: 'job_creation#job'
-    post  'create_other_job', to: 'job_creation#other_job'
+    post 'create_a_job', to: 'job_creation#job'
+    post 'create_other_job', to: 'job_creation#other_job'
   end
 
-  # this is the same as doing:
-  # get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify', as: :verify_immortus_job
-  # post 'create_a_job', to: 'job_creation#job'
-  # post 'create_other_job', to: 'job_creation#other_job'
+  # This is the same as doing:
+  get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify', as: :verify_immortus_job
+  post 'create_a_job', to: 'job_creation#job'
+  post 'create_other_job', to: 'job_creation#other_job'
 end
 ```
 
-The use of `immortus_jobs` is not mandatory but is recommended to be sure we can use __default verify__.
+The use of `immortus_jobs` is not mandatory but is recommended to be sure we can use __default verify__, it should only be used once.
 
 Controller
 ---
@@ -57,17 +55,19 @@ end
 
 ### Verify
 
-##### How does default verify works?
+Verify is called from JS to check a specific job status, so it is responsible to send info about one job.
 
-__default verify__ is a simple verify method `Immortus` bring to you due to convenience.
+##### How does default verify works
+
+__default verify__ is a simple verify method `Immortus` bring to you for convenience.
 
 It send `completed` to SJ if verify successfully run, i.e. strategy returns without error.
 It always send `job_id` to JS even if it fails to verify the job.
 
-It also works with job [Inline Tracking Strategy](tracking_strategies.md#inline-tracking-strategy) override if you also send `job_class` in `Immortus.verify` JS call.
+It also works with job [Inline Tracking Strategy](#inline-tracking-strategy) override if you also send `job_class` in `Immortus.verify` JS call.
 
 It has the ability to send extra fields to JS, you just need to define the method `meta(job_id)` in your strategy and return a hash with the extra fields you want.
-If you want to add the field percentage you could do something like:
+If you want to add the field progress you could do something like:
 
 ```ruby
 # app/jobs/tracking_strategy/some_custom_strategy.rb
@@ -79,7 +79,7 @@ module TrackingStrategy
       job = SomeTable.find_by(job_id: job_id)
 
       {
-        percentage: job.percentage
+        progress: job.progress
       }
     end
 
@@ -89,7 +89,7 @@ end
 
 you could also create your own custom verify
 
-##### How to create a custom verify?
+##### How to create a custom verify
 
 you will need to add a `get` route, something like this:
 
@@ -123,6 +123,135 @@ class JobCustomVerifyController < ApplicationController
   end
 end
 ```
+
+Tracking Strategy
+---
+
+### How configure which strategy should a job use?
+
+Tracking strategies are Ruby Objects that `Immortus` uses to track Jobs statuses. It will use an available tracking strategy in the following order:
+
+1. If the Job has defined an [Inline Tracking Strategy](#inline-tracking-strategy) it will use it.
+2. If not it will use the [User Global Configured](#user-global-configured) if defined
+3. Otherwise it will be [Inferred from the ActiveJob Queue Adapter](#inferred-from-the-activejob-queue-adapter)
+
+#### Inline Tracking Strategy
+
+```ruby
+# app/jobs/generate_invoice_job.rb
+class GenerateInvoiceJob < ActiveJob::Base
+  include Immortus::Job
+
+  # This will set this `redus_pub_sub_strategy` for this job only
+  tracking_strategy :redis_pub_sub_strategy
+
+  # ...
+end
+```
+
+#### User Global Configured
+
+Define in your Rails project an initializer that will set the tracking strategy to be used for all jobs.
+
+```ruby
+# config/initializer/immortus.rb
+
+Immortus::Job.tracking_strategy = :redis_pub_sub_strategy
+
+# you could also specify the class directly:
+Immortus::Job.tracking_strategy = TrackingStrategy::RedisPubSubStrategy
+```
+
+#### Inferred from the ActiveJob Queue Adapter
+
+The tracking strategy will be inferred from the Rails ActiveJob adapter ( config.active_job.adapter )
+
+Here is a list of the ActiveJob queue adapter and its mapped strategies:
+
+| ActiveJob QueueAdapter |    Inferred Strategy    |                      Wiki                      |
+|-----------------------:|:-----------------------:|:----------------------------------------------:|
+|           :delayed_job | :delayed\_job\_strategy | [How it works?](#delayed-job-strategy)  |
+|            :backburner |           N/A           |                       N/A                      |
+|                    :qu |           N/A           |                       N/A                      |
+|                   :que |           N/A           |                       N/A                      |
+|         :queue_classic |           N/A           |                       N/A                      |
+|               :sidekiq |           N/A           |                       N/A                      |
+|              :sneakers |           N/A           |                       N/A                      |
+|          :sucker_punch |           N/A           |                       N/A                      |
+|                :inline |           N/A           |                       N/A                      |
+
+
+### Define a custom tracking strategy
+
+You can define a custom strategy to control how should your job be tracked:
+
+```ruby
+# app/jobs/tracking_strategy/my_custom_tracking_strategy.rb
+module TrackingStrategy
+  class MyCustomTrackingStrategy
+
+    def job_enqueued(job_id)
+      # Save in a custom table that this job was created
+      MyCustomTrackingJobTable.create!(job_id: job_id, status: 'created')
+    end
+
+    def job_started(job_id)
+      find(job_id).update_attributes(status: 'started')
+    end
+
+    def job_finished(job_id)
+      job = find(job_id)
+      job.update_attributes(status: 'finished')
+    end
+
+    # completed? method is mandatory, should return a boolean ( true if job is finished, false otherwise )
+    def completed?(job_id)
+      job = find(job_id)
+      job.status == 'finished'
+    end
+
+    # if `meta` method is defined, the returned hash this will be added in every verify request
+    def meta(job_id)
+      job = find(job_id)
+
+      {
+        status: job.status
+      }
+    end
+
+    private
+
+    def find(job_id)
+      MyCustomTrackingJobTable.find_by(job_id: job_id)
+    end
+  end
+end
+```
+
+Here is a list of what methods you can use when making a custom tracking strategy:
+
+|    Method    | Mandatory |   Type   |                                      Description                                     |
+|:------------:|:---------:|:--------:|:------------------------------------------------------------------------------------:|
+|  completed?  |  Required |          |           Should return a boolean. True if job completed, false otherwise.           |
+|     meta     |  Optional |          | Additonal data that will be appended to the JSON response. Should return a ruby Hash |
+| job_enqueued |  Optional | Callback |          Called when job was enqueued by ActiveJob 'after_enqueue' callback          |
+|  job_started |  Optional | Callback |          Called when job was started by ActiveJob 'before_perform' callback          |
+| job_finished |  Optional | Callback |          Called when job was finished by ActiveJob 'after_perform' callback          |
+
+### How inferred Strategies works
+
+#### Delayed::Job Strategy
+
+Since Delayed::Job already persist data we don't need none of the callbacks, we just need to define completed? and find
+
+##### completed?(job_id)
+
+- Whenever a job is finished Delayed::Job will delete that record from the DB
+- By default, when it reaches the maximum number of failed tries it also delete the record from DB (false positive?)
+
+##### find(job_id)
+
+- Look for job_id inside handler column (NOT VERY EFFICIENT...)
 
 Immortus::Job
 ---
@@ -222,7 +351,8 @@ var jobFailed = function(data) {
 
 var jobInProgress = function(data) {
   // Executed every `verify job` AJAX request
-  // it is called each `long_polling.interval` milliseconds (defaults to 500) after last success, until completed or failed
+  // it is called each `long_polling.interval` milliseconds (defaults to 500) after last success,
+  // until completed or failed
   console.log('Job ' + data.job_id + ' is still executing ...');
 }
 ```
