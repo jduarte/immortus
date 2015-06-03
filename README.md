@@ -178,8 +178,12 @@ Contributing
 License
 ---
 
-Copyright © 2015 [Runtime Revolution](http://www.runtime-revolution.com/), released under the MIT license.
+Copyright © 2015 [Runtime Revolution](http://www.runtime-revolution.com), released under the MIT license.
 
-You are not granted rights or licenses to the trademarks of Runtime Revolution
+About Runtime Revolution
+---
 
-[![Runtime Revolution](./docs/runtime-revolution-logo.png)](http://www.runtime-revolution.com/)
+![Runtime Revolution](http://webpublishing.s3.amazonaws.com/runtime_small_logo.png)
+
+Immortus is maintained by [Runtime Revolution](http://www.runtime-revolution.com).
+See our [other projects](https://github.com/runtimerevolution/) and check out our [blog](http://www.runtime-revolution.com/runtime/blog) for the latest updates.
