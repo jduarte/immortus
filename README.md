@@ -1,6 +1,13 @@
 Immortus
 ===
 
+[![Gem Version](https://badge.fury.io/rb/immortus.svg)](http://badge.fury.io/rb/immortus)
+[![Build Status](https://travis-ci.org/runtimerevolution/immortus.svg?branch=master)](https://travis-ci.org/runtimerevolution/immortus)
+[![Code Climate](https://codeclimate.com/github/runtimerevolution/immortus/badges/gpa.svg)](https://codeclimate.com/github/runtimerevolution/immortus)
+[![Dependency Status](https://gemnasium.com/runtimerevolution/immortus.svg)](https://gemnasium.com/runtimerevolution/immortus)
+[![security](https://hakiri.io/github/runtimerevolution/immortus/master.svg)](https://hakiri.io/github/runtimerevolution/immortus/master)
+[![Coverage Status](https://coveralls.io/repos/runtimerevolution/immortus/badge.svg)](https://coveralls.io/r/runtimerevolution/immortus)
+
 ![Immortus](./docs/Immortus.jpg)
 
 > The ruler of Limbo, Immortus bartered with the near-omnipotent Time-Keepers for immortality, in exchange becoming their agent in preserving timelines at all costs, no matter how many lives get disrupted, ruined, or erased.
@@ -51,10 +58,10 @@ And then execute:
 $ bundle
 ```
 
-Example usage
+Getting started
 ---
 
-##### Setup
+### Setup
 
 ```javascript
 // Require Immortus in your Manifest ( make sure jQuery is included at this point ):
@@ -72,7 +79,7 @@ Rails.application.routes.draw do
 end
 ```
 
-##### Track an ongoing Invoice job and notify the UI when finished
+### Example: Track an ongoing Invoice job and notify the UI when finished
 
 ```javascript
 $('.js-track-invoice').each(function() {
@@ -93,7 +100,7 @@ class GenerateInvoiceJob < ActiveJob::Base
 end
 ```
 
-##### Create an Invoice job and notify the UI when finished
+### Example: Create an Invoice job and notify the UI when finished
 
 ```javascript
 $('.js-create-invoice').click(function() {
@@ -159,6 +166,14 @@ Development
 For test with guard
 
     $ bundle exec guard
+
+Future Developments
+---
+
+* Support all ActiveJob adapters
+* Support Web Sockets
+
+For more details see the [ROADMAP](./docs/ROADMAP.md)
 
 Contributing
 ---
