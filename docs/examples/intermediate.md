@@ -1,11 +1,5 @@
-Create a Job and track progress
+Create a Job to process an image and update the progress in UI
 ===
-
-In this example we assume:
-
-- you will create a new background job
-- you need an extra field to be displayed (percentage)
-- you may have more then one strategy configured globally
 
 Routes (file: config/routes.rb)
 ---
@@ -15,12 +9,8 @@ Rails.application.routes.draw do
   # ...
 
   immortus_jobs do
-    post 'generate_job', to: 'job#generate'
+    post 'process_image', to: 'image#process'
   end
-
-  # same as write:
-  # get '/immortus/verify/:job_id(/:job_class)', to: 'immortus#verify'
-  # post 'generate_job', to: 'job#generate'
 end
 ```
 
@@ -28,16 +18,17 @@ Tracking Strategy
 ---
 
 ```ruby
-# app/jobs/tracking_strategy/my_custom_tracking_strategy.rb
+# app/jobs/tracking_strategy/process_image_strategy.rb
 module TrackingStrategy
-  class MyCustomTrackingStrategy
+  class ProcessImageStrategy
 
     def job_enqueued(job_id)
-      MyCustomTrackingJobTable.create!(job_id: job_id, status: 'created', percentage: 0)
+      ProcessImageTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
     end
 
     def job_started(job_id)
-      find(job_id).update_attributes(status: 'started')
+      job = find(job_id)
+      job.update_attributes(status: 'running')
     end
 
     def job_finished(job_id)
@@ -50,13 +41,11 @@ module TrackingStrategy
       job.update_attributes(percentage: percentage)
     end
 
-    # completed? method is mandatory, should return a boolean ( true if job is finished, false otherwise )
     def completed?(job_id)
       job = find(job_id)
       job.status == 'finished'
     end
 
-    # if meta method is defined, the returned hash will be added in every verify request
     def meta(job_id)
       job = find(job_id)
 
@@ -68,7 +57,7 @@ module TrackingStrategy
     private
 
     def find(job_id)
-      MyCustomTrackingJobTable.find_by(job_id: job_id)
+      ProcessImageTable.find_by(job_id: job_id)
     end
   end
 end
@@ -79,18 +68,17 @@ In this case we need to create a `meta(job_id)` method so __default verify__ can
 Job
 ---
 
-Just add `include Immortus::Job` into your ActiveJob. Example:
-
 ```ruby
-# app/jobs/my_job.rb
-class MyJob < ActiveJob::Base
+# app/jobs/process_image_job.rb
+class ProcessImageJob < ActiveJob::Base
   include Immortus::Job
 
-  tracking_strategy :my_custom_tracking_strategy
+  tracking_strategy :process_image_strategy
 
   def perform(record)
-    # Do stuff ...
-    # self.strategy.update_percentage(job_id, percentage)
+    # do some heavy processing ...
+    # update job percentage by using:
+    #   self.strategy.update_percentage(job_id, percentage)
   end
 end
 ```
@@ -99,32 +87,34 @@ Generate job method
 ---
 
 ```ruby
-class JobController < ApplicationController
-  def generate
-    job = MyJob.perform_later
+class ImageController < ApplicationController
+  def process
+    job = ProcessImageJob.perform_later
     render_immortus job
-
-    # `render_immortus job` is same as write:
-    # if job.try('job_id')
-    #   render json: { job_id: job.job_id, job_class: job.class.name }
-    # else
-    #   render json: {}, status: 500
-    # end
   end
 end
 ```
 
-JS Create
+JavaScript Create
 ---
 
 ```javascript
+var jobCreatedSuccessfully = function(data) {
+  // logic to add some loading gif
+
+  return { job_id: data.job_id, job_class: data.job_class };
+};
+
+var jobFailedToCreate = function() {
+  alert('Job failed to create');
+};
+
 var jobFinished = function(data) {
-  // Job was completed here. `data` has the info returned in the 'Intermediate', 'Explicit' `JobController#verify`
-  console.log(data.job_id + ' finished successfully.');
+  // logic to finish ... like show image thumbnail
 };
 
 var jobFailed = function(data) {
-  console.log('error in job ' + data.job_id);
+  alert('Job failed');
 };
 
 var jobInProgress = function(data) {
@@ -132,44 +122,28 @@ var jobInProgress = function(data) {
 };
 
 Immortus.create('/generate_invoice')
-        .then(function(data) {
-          return Immortus.verify({ jobId: data.job_id })
+        .then(jobCreatedSuccessfully, jobFailedToCreate)
+        .then(function(jobInfo) {
+          return Immortus.verify(jobInfo)
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 ```
 
-In this example we assume that creation of job never fail (if it fails it does nothing)
-
-JS Verify
+JavaScript Verify
 ---
 
+we need this if we want the info to persist in a refresh
+
 ```javascript
-var jobFinished = function(data) {
-  // Job was completed here. `data` has the info returned in the `JobCustomVerifyController#verify`
-  console.log(data.job_id + ' finished successfully.');
-};
-
-var jobFailed = function(data) {
-  console.log('error in job ' + data.job_id);
-};
-
-var jobInProgress = function(data) {
-  // logic to update percentage with `data.percentage` ... which came from meta method
-};
+// using some of the same functions from `JavaScript Create` section
 
 var jobInfo = {
-  jobId: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
-  jobClass: 'my_job'
+  job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
+  job_class: 'ProcessImageJob'
 };
 
-var options = {
-  polling: {
-    interval: 800
-  }
-};
-
-Immortus.verify(jobInfo, options)
+Immortus.verify(jobInfo)
         .then(jobFinished, jobFailed, jobInProgress);
 ```
 
-In this case we need to send `jobClass` so __default verify__ could know what job is working with
+In this case we need to send `job_class` so __default verify__ could know what job is working with
