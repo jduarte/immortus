@@ -152,7 +152,7 @@ For a full documentation on how this works please check:
 
 ### Some more advanced examples
 
-By allowing [custom strategies](./docs/tracking_strategies.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify) Immortus can be used for more complex work. Just a few examples:
+By allowing [custom strategies](./docs/tracking_strategies.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify) `Immortus` can be used for more complex work. Just a few examples:
 
 * [Create a Job and track progress](./docs/examples/intermediate.md)
 * [Create a Job and track progress with custom verify](./docs/examples/explicit.md)
@@ -185,5 +185,5 @@ About Runtime Revolution
 
 ![Runtime Revolution](http://webpublishing.s3.amazonaws.com/runtime_small_logo.png)
 
-Immortus is maintained by [Runtime Revolution](http://www.runtime-revolution.com).
+`Immortus` is maintained by [Runtime Revolution](http://www.runtime-revolution.com).
 See our [other projects](https://github.com/runtimerevolution/) and check out our [blog](http://www.runtime-revolution.com/runtime/blog) for the latest updates.
