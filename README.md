@@ -152,8 +152,8 @@ Some more advanced examples
 
 `Immortus` can be used for more complex work by allowing [custom strategies](./docs/full.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify). Just a few examples:
 
-* [Create a Job to process an image and update the progress in UI](./docs/examples/intermediate.md)
-* [Create a Job to send emails and track his progress ( with a custom verify )](./docs/examples/explicit.md)
+* [Image Processor ( custom strategy )](./docs/examples/custom_strategy.md)
+* [Background Video Processor ( custom verify )](./docs/examples/custom_verify.md)
 * TODO: Add more examples here
 
 Development
