@@ -29,13 +29,15 @@ By default, tracking strategy will be inferred from ActiveJob Queue Adapter, but
 
 You can see how tracking strategies work in more detail [here](./docs/full.md#tracking-strategy)
 
-### Requirements
+Requirements
+---
 
 - Rails ( >= 4.0 )
 - ActiveJob ( add `gem 'activejob_backport'` to Gemfile if 4.0 <= Rails < 4.2 )
 - jQuery
 
-### Installation
+Installation
+---
 
 Add to your application's Gemfile:
 
@@ -49,7 +51,8 @@ And then execute:
 $ bundle
 ```
 
-### Example usage
+Example usage
+---
 
 ##### Setup
 
@@ -130,7 +133,8 @@ class GenerateInvoiceJob < ActiveJob::Base
 end
 ```
 
-### Full documentation
+Full documentation
+---
 
 For a full documentation on how this works please check:
 
