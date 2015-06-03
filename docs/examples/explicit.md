@@ -14,12 +14,12 @@ Routes (file: config/routes.rb)
 Rails.application.routes.draw do
   # ...
 
-  get  'job_custom_verify/:job_id', to: 'job_custom_verify#verify'
-  post '/generate_job', :to => 'job#generate'
+  immortus_jobs do
+    get 'job_custom_verify/:job_id', to: 'job_custom_verify#verify'
+    post '/generate_job', :to => 'job#generate'
+  end
 end
 ```
-
-This should be used if we explicitly want to see what is going on or if we don't need __default verify__ (case presented).
 
 In this case we also need the custom verify, defined in __Verify job method__ section
 
@@ -51,7 +51,7 @@ module TrackingStrategy
       job.update_attributes(percentage: percentage)
     end
 
-    def percentage(job_id)
+    def progress(job_id)
       job = find(job_id)
       job.percentage
     end
@@ -101,7 +101,7 @@ class JobCustomVerifyController < ApplicationController
 
     render json: {
       :completed => strategy.completed?(params[:job_id]),
-      :percentage => strategy.percentage(params[:job_id])
+      :percentage => strategy.progress(params[:job_id])
     }
   end
 end
