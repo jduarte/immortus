@@ -143,7 +143,8 @@ For a full documentation on how this works please check:
 * [Controller](./docs/full.md#controller)
 * [Immortus::Job](./docs/full.md#immortus-job)
 
-### Some more advanced examples
+Some more advanced examples
+---
 
 By allowing [custom strategies](./docs/full.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify) `Immortus` can be used for more complex work. Just a few examples:
 
