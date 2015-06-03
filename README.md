@@ -72,7 +72,7 @@ Rails.application.routes.draw do
 end
 ```
 
-##### Track an Invoice job and then notify the UI when finished
+##### Track an ongoing Invoice job and notify the UI when finished
 
 ```javascript
 $('.js-track-invoice').each(function() {
@@ -93,7 +93,7 @@ class GenerateInvoiceJob < ActiveJob::Base
 end
 ```
 
-##### Create an Invoice job and then notify the UI when finished
+##### Create an Invoice job and notify the UI when finished
 
 ```javascript
 $('.js-create-invoice').click(function() {
