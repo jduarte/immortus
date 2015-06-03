@@ -107,9 +107,9 @@ class JobCustomVerifyController < ApplicationController
 end
 ```
 
-returned `json` will be available in `data` within JS callbacks
+returned `json` will be available in `data` within JavaScript callbacks
 
-`completed` must be one of returned `json` parameters, so JS knows when to stop polling
+`completed` must be one of returned `json` parameters, so JavaScript knows when to stop polling
 
 Generate job method
 ---

@@ -14,7 +14,7 @@ Immortus
 
 ### What does Immortus do
 
-`Immortus` tracks ActiveJob jobs statuses and lets you handle them on your UI through Javascript callbacks.
+`Immortus` tracks ActiveJob jobs statuses and lets you handle them on your UI through JavaScript callbacks.
 
 Currently `Immortus` uses Polling to verify job status. Web Sockets support is on the [ROADMAP](./docs/ROADMAP.md).
 
@@ -141,7 +141,7 @@ Full documentation
 
 For a full documentation on how this works please check:
 
-* [Javascript](./docs/full.md#javascript)
+* [JavaScript](./docs/full.md#javascript)
 * [Routes](./docs/full.md#routes)
 * [Controller](./docs/full.md#controller)
 * [Immortus::Job](./docs/full.md#immortus-job)

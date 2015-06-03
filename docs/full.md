@@ -28,7 +28,7 @@ Controller
 
 ### Create Job
 
-`Immortus` has a render (`render_immortus(job)`) that help you send needed data to `Immortus.create` JS callback
+`Immortus` has a render (`render_immortus(job)`) that help you send needed data to `Immortus.create` JavaScript callback
 
 ```ruby
 # app/controllers/sample_controller.rb
@@ -42,7 +42,7 @@ end
 
 To this to work you need to use ActiveJob `perform_later` method, otherwise it will not generate a job_id.
 
-`render_immortus` sends `job_id` and `job_class` to `Immortus.create` JS callbacks.
+`render_immortus` sends `job_id` and `job_class` to `Immortus.create` JavaScript callbacks.
 `render_immortus(job)` is the same as write:
 
 ```ruby
@@ -55,16 +55,16 @@ end
 
 ### Verify
 
-Verify is called from JS to check a specific job status, so it is responsible to send info about one job.
+Verify is called from JavaScript to check a specific job status, so it is responsible to send info about one job.
 
 ##### How does default verify works
 
 __default verify__ is a simple verify method `Immortus` bring to you for convenience.
 
-It send `completed` to SJ if verify successfully run, i.e. strategy returns without error.
-It always send `job_id` to JS even if it fails to verify the job.
+It send `completed` to JavaScript if verify successfully run, i.e. strategy returns without error.
+It always send `job_id` to JavaScript even if it fails to verify the job.
 
-It also works with job [Inline Tracking Strategy](#inline-tracking-strategy) override if you also send `job_class` in `Immortus.verify` JS call.
+It also works with job [Inline Tracking Strategy](#inline-tracking-strategy) override if you also send `job_class` in `Immortus.verify` JavaScript call.
 
 It has the ability to send extra fields to JS, you just need to define the method `meta(job_id)` in your strategy and return a hash with the extra fields you want.
 If you want to add the field progress you could do something like:
@@ -314,7 +314,7 @@ end
 JavaScript
 ---
 
-For all JS code snippets we are using this functions to illustrate what is going on
+For all JavaScript code snippets we are using this functions to illustrate what is going on
 
 ```javascript
 var jobCreatedSuccessfully = function(data) {

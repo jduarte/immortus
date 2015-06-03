@@ -5,7 +5,7 @@ ROADMAP
 
 - [x] Tests
 - [x] Routes DSL ( immortus_jobs )
-- [x] Immortus JS ( polling )
+- [x] Immortus JavaScript ( polling )
 - [x] Default verify ( ImmortusController#verify )
 - [x] Tracking Strategies
     - [x] Delayed Job ( AR )
@@ -34,7 +34,7 @@ ROADMAP
     - [ ] Sneakers
     - [ ] Sucker Punch
     - [ ] Active Job Inline
-- [ ] Ensure JS callbacks `data` is available
+- [ ] Ensure JavaScript callbacks `data` is available
 - [ ] LOGS
 
 #### Future Developments
