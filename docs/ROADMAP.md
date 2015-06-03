@@ -5,7 +5,7 @@ ROADMAP
 
 - [x] Tests
 - [x] Routes DSL ( immortus_jobs )
-- [x] Immortus JS ( long polling )
+- [x] Immortus JS ( polling )
 - [x] Default verify ( ImmortusController#verify )
 - [x] Tracking Strategies
     - [x] Delayed Job ( AR )

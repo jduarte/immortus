@@ -109,7 +109,7 @@ end
 
 returned `json` will be available in `data` within JS callbacks
 
-`completed` must be one of returned `json` parameters, so JS knows when to stop long polling
+`completed` must be one of returned `json` parameters, so JS knows when to stop polling
 
 Generate job method
 ---
@@ -160,12 +160,12 @@ Immortus.create('/process_image')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobInfo) {
           var verifyJobUrl = '/job_custom_verify/' + jobInfo.job_id;
-          return Immortus.verify({ verify_job_url: verifyJobUrl }, { long_polling: { interval: 1800 } })
+          return Immortus.verify({ verify_job_url: verifyJobUrl }, { polling: { interval: 1800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 ```
 
-In this example, we differ from Intermediate by handling creation success/error, and setting long polling parameters just to show what we can control.
+In this example, we differ from Intermediate by handling creation success/error, and setting polling parameters just to show what we can control.
 
 JS Verify
 ---
@@ -189,7 +189,7 @@ var jobInfo = {
 };
 
 var options = {
-  long_polling: {
+  polling: {
     interval: 800
   }
 };

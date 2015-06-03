@@ -107,7 +107,7 @@ end
 ```
 
 and create the controller method returning a JSON used in JavaScript (`data` argument).
-`completed` must be one of the returned keys, so JavaScript knows when to stop `Long Polling`
+`completed` must be one of the returned keys, so JavaScript knows when to stop `Polling`
 so it should be true if job is finished.
 
 ```ruby
@@ -351,7 +351,7 @@ var jobFailed = function(data) {
 
 var jobInProgress = function(data) {
   // Executed every `verify job` AJAX request
-  // it is called each `long_polling.interval` milliseconds (defaults to 500) after last success,
+  // it is called each `polling.interval` milliseconds (defaults to 500) after last success,
   // until completed or failed
   console.log('Job ' + data.job_id + ' is still executing ...');
 }
@@ -363,7 +363,7 @@ var jobInProgress = function(data) {
 Immortus.create('/create_job')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobInfo) {
-          return Immortus.verify(jobInfo, { long_polling: { interval: 800 } })
+          return Immortus.verify(jobInfo, { polling: { interval: 800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 
@@ -402,8 +402,8 @@ var jobInfo = {
 };
 
 var options = {
-  // currently we only support long polling
-  long_polling: {
+  // currently we only support polling
+  polling: {
     // `interval` is the minimum wait time in millisconds from last success request (default is 500)
     // i.e. if server responds in 200ms and we set `interval` to 800
     //      we get a new request in server every second (aprox.)

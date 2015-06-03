@@ -124,7 +124,7 @@ var jobInProgress = function(data) {
 Immortus.create('/process_image')
         .then(jobCreatedSuccessfully, jobFailedToCreate)
         .then(function(jobInfo) {
-          return Immortus.verify(jobInfo, { long_polling: { interval: 1800 } })
+          return Immortus.verify(jobInfo, { polling: { interval: 1800 } })
                          .then(jobFinished, jobFailed, jobInProgress);
         });
 ```
@@ -135,6 +135,6 @@ To only track an existing job without creating it:
 // render_immortus returns the job_class.
 // in this case since we don't use the create job so we need to pass the jobClass manually.
 var jobInfo = { job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417', job_class: 'ProcessImageJob' }
-Immortus.verify(jobInfo, { long_polling: { interval: 1800 } })
+Immortus.verify(jobInfo, { polling: { interval: 1800 } })
         .then(jobFinished, jobFailed, jobInProgress);
 ```

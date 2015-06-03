@@ -16,7 +16,7 @@ Immortus
 
 `Immortus` tracks ActiveJob jobs statuses and lets you handle them on your UI through Javascript callbacks.
 
-Currently `Immortus` uses Long Polling to verify job status. Web Sockets support is on the [ROADMAP](./docs/ROADMAP.md).
+Currently `Immortus` uses Polling to verify job status. Web Sockets support is on the [ROADMAP](./docs/ROADMAP.md).
 
 ### When should I use Immortus
 
