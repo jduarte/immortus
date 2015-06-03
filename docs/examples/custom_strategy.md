@@ -1,5 +1,9 @@
-Create a Job to process an image and update the progress in UI
+Image Processor
 ===
+
+In this example:
+* A user uploads a image to the server to be processed
+* The UI will show job progress (percentage)
 
 Routes (file: config/routes.rb)
 ---
@@ -49,9 +53,11 @@ module TrackingStrategy
     def meta(job_id)
       job = find(job_id)
 
-      {
-        percentage: job.percentage
-      }
+      result = { percentage: job.percentage }
+
+      result[thumbnail] = job.thumbnail unless job.thumbnail.blank?
+
+      result
     end
 
     private
@@ -99,40 +105,40 @@ JavaScript Create
 ---
 
 ```javascript
-var jobCreatedSuccessfully = function(data) {
-  // logic to add some loading gif
+var imageCreated = function(data) {
+  $('.images').append('<div class="image-' + data.job_id + '"><span class="loading-icon"></span></div>');
 
   return { job_id: data.job_id, job_class: data.job_class };
 };
 
-var jobFailedToCreate = function() {
-  alert('Job failed to create');
+var imageProcessed = function(data) {
+  $('.images > .image-' + data.job_id).html('<img src="' + data.thumbnail + '">');
 };
 
-var jobFinished = function(data) {
-  // logic to finish ... like show image thumbnail
+var imageNotProcessed = function(data) {
+  alert('Image could not be processed');
 };
 
-var jobFailed = function(data) {
-  alert('Job failed');
-};
-
-var jobInProgress = function(data) {
-  // logic to update percentage with `data.percentage` ... which came from meta method
+var processingImage = function(data) {
+  $('.images > .image-' + data.job_id).html('<span>progress: ' + data.percentage + '</span>');
 };
 
 Immortus.create('/process_image')
-        .then(jobCreatedSuccessfully, jobFailedToCreate)
+        .then(imageCreated)
         .then(function(jobInfo) {
           return Immortus.verify(jobInfo)
-                         .then(jobFinished, jobFailed, jobInProgress);
+                         .then(imageProcessed, imageNotProcessed, processingImage);
         });
 ```
 
 JavaScript Verify
 ---
 
-we need this if we want the info to persist in a refresh
+We need this if we want the info to persist in a refresh
+
+```html
+<div class="image-908ec6f1-e093-4943-b7a8-7c84eccfe417"><span class="loading-icon"></span></div>
+```
 
 ```javascript
 // using some of the same functions from `JavaScript Create` section
@@ -143,7 +149,7 @@ var jobInfo = {
 };
 
 Immortus.verify(jobInfo)
-        .then(jobFinished, jobFailed, jobInProgress);
+        .then(imageProcessed, imageNotProcessed, processingImage);
 ```
 
 In this case we need to send `job_class` so __default verify__ could know what job is working with
