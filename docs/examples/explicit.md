@@ -4,9 +4,9 @@ In this example:
 
 * A User uploads a video to the server to be processed
 * The UI will show the User medal if it has any
-  * **Bronze** - Uploaded more than 5 videos
-  * **Silver** - Uploaded more than 20 videos
-  * **Gold** - Uploaded more than 50 videos
+    * **Bronze** - Uploaded more than 5 videos
+    * **Silver** - Uploaded more than 20 videos
+    * **Gold** - Uploaded more than 50 videos
 
 ### Routes
 
@@ -49,11 +49,11 @@ class JobCustomVerifyController < ApplicationController
   def verify
     data = { :completed => VideoProcessorJob.strategy.completed?(params[:job_id]) }
 
-    # The JSON we will respond in the `verify` will become available in the JS
     if data[:completed]
       data[:videos_processed_count] = current_user.videos_processed.count
     end
 
+    # returned JSON will become available in every verify JavaScript callbacks
     render json: data
   end
 end
