@@ -69,15 +69,6 @@ Getting started
 //= require immortus
 ```
 
-```ruby
-# config/routes.rb
-Rails.application.routes.draw do
-  # Add the route to default verify
-  # this is usually used with a block containing all job creation routes
-  immortus_jobs
-end
-```
-
 ### Example 1: Track an ongoing Invoice job and notify the UI when finished
 
 ```javascript
@@ -88,6 +79,12 @@ $('.js-track-invoice').each(function() {
 ```
 
 ```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  # Add the route to default verify
+  immortus_jobs
+end
+
 # app/jobs/generate_invoice_job.rb
 class GenerateInvoiceJob < ActiveJob::Base
   # Include Immortus::Job in your new or existing ActiveJob class
@@ -114,7 +111,7 @@ $('.js-create-invoice').click(function() {
 ```ruby
 # config/routes.rb
 Rails.application.routes.draw do
-  # Change routes DSL to receive a block for the job creation
+  # Add the route to default verify and job creation
   immortus_jobs do
     post 'generate_invoice', to: 'invoices#generate'
   end
