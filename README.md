@@ -23,25 +23,26 @@ Currently `Immortus` uses Long Polling to verify job status. Web Sockets support
 When you need to keep track of an async job.
 For example:
 
-- send emails
-- upload / process an image
-- import / export files ( .xls, .csv, ... )
-- etc.
+* send emails
+* upload / process an image
+* import / export files ( .xls, .csv, ... )
+* etc.
 
 ### How does Immortus work
 
 `Immortus` will use a tracking strategy, based on ActiveJob callbacks, to keep track of the jobs statuses.
 
-By default, tracking strategy will be inferred from ActiveJob Queue Adapter, but we know that you may need more complexity so we let you create your own!
+By default, tracking strategy will be inferred from ActiveJob Queue Adapter.
+You could also create your own to better fit your needs.
 
 You can see how tracking strategies work in more detail [here](./docs/full.md#tracking-strategy)
 
 Requirements
 ---
 
-- Rails ( >= 4.0 )
-- ActiveJob ( add `gem 'activejob_backport'` to Gemfile if 4.0 <= Rails < 4.2 )
-- jQuery
+* Rails ( >= 4.0 )
+* ActiveJob ( add `gem 'activejob_backport'` to Gemfile if 4.0 <= Rails < 4.2 )
+* jQuery ( >= 1.5 )
 
 Installation
 ---
@@ -54,9 +55,7 @@ gem 'immortus'
 
 And then execute:
 
-```
-$ bundle
-```
+    $ bundle
 
 Getting started
 ---
@@ -79,7 +78,7 @@ Rails.application.routes.draw do
 end
 ```
 
-### Example: Track an ongoing Invoice job and notify the UI when finished
+### Example 1: Track an ongoing Invoice job and notify the UI when finished
 
 ```javascript
 $('.js-track-invoice').each(function() {
@@ -100,7 +99,7 @@ class GenerateInvoiceJob < ActiveJob::Base
 end
 ```
 
-### Example: Create an Invoice job and notify the UI when finished
+### Example 2: Create an Invoice job and notify the UI when finished
 
 ```javascript
 $('.js-create-invoice').click(function() {
@@ -153,7 +152,7 @@ For a full documentation on how this works please check:
 Some more advanced examples
 ---
 
-By allowing [custom strategies](./docs/full.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify) `Immortus` can be used for more complex work. Just a few examples:
+`Immortus` can be used for more complex work by allowing [custom strategies](./docs/full.md#define-a-custom-tracking-strategy) and [custom verify controllers](./docs/full.md#how-to-create-a-custom-verify). Just a few examples:
 
 * [Create a Job and track progress](./docs/examples/intermediate.md)
 * [Create a Job and track progress with custom verify](./docs/examples/explicit.md)
