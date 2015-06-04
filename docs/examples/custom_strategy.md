@@ -1,19 +1,52 @@
-# Image Processor
+# CSV Processor
 
 In this example:
 
-* A User uploads a image to the server to be processed
-* The UI will show job progress (percentage)
+* A User uploads a CSV to the server to be processed
+* The job will perform the CSV processing row by row and will update the percentage as it goes
+* The UI will show the percentage being updated
 
 ### Routes
 
 ```ruby
 # config/routes.rb
 Rails.application.routes.draw do
-  # ...
-
   immortus_jobs do
-    post 'process_image', to: 'image#process'
+    post 'process_csv', to: 'csv#process'
+  end
+end
+```
+
+### Generate job method
+
+```ruby
+class CsvController < ApplicationController
+  def process
+    job = CsvProcessorJob.perform_later(params[:file])
+    render_immortus(job)
+  end
+end
+```
+
+### Job
+
+```ruby
+# app/jobs/process_csv_job.rb
+class CsvProcessorJob < ActiveJob::Base
+  include Immortus::Job
+
+  tracking_strategy :csv_processor_strategy
+
+  def perform(file)
+    reader = CsvReader.new(file)
+
+    rows_processed = 0
+    reader.each_row do |row|
+      Processor.new(row).do_some_stuff_with_this_row_data!
+      rows_processed += 1
+      percentage = ((rows_processed.to_f / reader.total_rows) * 100).floor
+      strategy.update_progress(self.job_id, percentage)
+    end
   end
 end
 ```
@@ -21,12 +54,12 @@ end
 ### Tracking Strategy
 
 ```ruby
-# app/jobs/tracking_strategy/process_image_strategy.rb
+# app/jobs/tracking_strategy/csv_processor_strategy.rb
 module TrackingStrategy
-  class ProcessImageStrategy
+  class CsvProcessorStrategy
 
     def job_enqueued(job_id)
-      ProcessImageTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
+      CsvProcessorTable.create!(job_id: job_id, status: 'enqueued', percentage: 0)
     end
 
     def job_started(job_id)
@@ -63,74 +96,50 @@ module TrackingStrategy
     private
 
     def find(job_id)
-      ProcessImageTable.find_by(job_id: job_id)
+      CsvProcessorTable.find_by(job_id: job_id)
     end
-  end
-end
-```
-
-### Job
-
-```ruby
-# app/jobs/process_image_job.rb
-class ProcessImageJob < ActiveJob::Base
-  include Immortus::Job
-
-  tracking_strategy :process_image_strategy
-
-  def perform(record)
-    # code to process image ...
-    # you could update job progress by using:
-    #   self.strategy.update_progress(job_id, percentage)
-  end
-end
-```
-
-### Generate job method
-
-```ruby
-class ImageController < ApplicationController
-  def process
-    job = ProcessImageJob.perform_later
-    render_immortus job
   end
 end
 ```
 
 ### HTML
 
-```html
-<div class="images">
-  <!-- ... -->
+```erb
+<div class="csvs">
+  <% @csvs_being_processed.each do |csv| %>
+    <div class="csv" data-job-id="<%= csv.job_id %>">
+
+    </div>
+  <% end %>
 </div>
 ```
 
 ### JavaScript Create
 
 ```javascript
-var imageCreated = function(data) {
-  $('.images').append('<div class="image-' + data.job_id + '"><span class="loading-icon"></span></div>');
+var csvCreated = function(data) {
+  $('.csvs').append('<div class="csv-' + data.job_id + '"><span class="loading-icon"></span></div>');
 
   return { job_id: data.job_id, job_class: data.job_class };
 };
 
-var imageProcessed = function(data) {
-  $('.images > .image-' + data.job_id).html('<img src="' + data.thumbnail + '">');
+var csvProcessed = function(data) {
+  $('.csvs > .csv-' + data.job_id).html('<img src="' + data.thumbnail + '">');
 };
 
-var imageNotProcessed = function(data) {
-  alert('Image could not be processed');
+var csvNotProcessed = function(data) {
+  alert('csv could not be processed');
 };
 
-var processingImage = function(data) {
-  $('.images > .image-' + data.job_id).html('<span>progress: ' + data.percentage + '</span>');
+var processingcsv = function(data) {
+  $('.csvs > .csv-' + data.job_id).html('<span>progress: ' + data.percentage + '</span>');
 };
 
-Immortus.create('/process_image')
-        .then(imageCreated)
+Immortus.create('/process_csv')
+        .then(csvCreated)
         .then(function(jobInfo) {
           return Immortus.verify(jobInfo)
-                         .then(imageProcessed, imageNotProcessed, processingImage);
+                         .then(csvProcessed, csvNotProcessed, processingcsv);
         });
 ```
 
@@ -139,9 +148,9 @@ Immortus.create('/process_image')
 We need this if we want the info to persist in a refresh
 
 ```html
-<div class="images">
+<div class="csvs">
   <!-- ... -->
-  <div class="image-908ec6f1-e093-4943-b7a8-7c84eccfe417"><span class="loading-icon"></span></div>
+  <div class="csv-908ec6f1-e093-4943-b7a8-7c84eccfe417"><span class="loading-icon"></span></div>
 </div>
 ```
 
@@ -151,9 +160,9 @@ We need this if we want the info to persist in a refresh
 // In this case we need to explicitly set `job_class` to be sure we use the correct strategy
 var jobInfo = {
   job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
-  job_class: 'ProcessImageJob'
+  job_class: 'CsvProcessorJob'
 };
 
 Immortus.verify(jobInfo)
-        .then(imageProcessed, imageNotProcessed, processingImage);
+        .then(csvProcessed, csvNotProcessed, processingcsv);
 ```
