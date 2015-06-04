@@ -1,14 +1,14 @@
-Image Processor
-===
+# Image Processor
 
 In this example:
-* A user uploads a image to the server to be processed
+
+* A User uploads a image to the server to be processed
 * The UI will show job progress (percentage)
 
-Routes (file: config/routes.rb)
----
+### Routes
 
 ```ruby
+# config/routes.rb
 Rails.application.routes.draw do
   # ...
 
@@ -18,8 +18,7 @@ Rails.application.routes.draw do
 end
 ```
 
-Tracking Strategy
----
+### Tracking Strategy
 
 ```ruby
 # app/jobs/tracking_strategy/process_image_strategy.rb
@@ -40,7 +39,7 @@ module TrackingStrategy
       job.update_attributes(status: 'finished', percentage: 100)
     end
 
-    def update_percentage(job_id, percentage)
+    def update_progress(job_id, percentage)
       job = find(job_id)
       job.update_attributes(percentage: percentage)
     end
@@ -50,6 +49,7 @@ module TrackingStrategy
       job.status == 'finished'
     end
 
+    # Hash returned in this method (it's a default verify feature) will be sent to verify JavaScript callbacks
     def meta(job_id)
       job = find(job_id)
 
@@ -69,10 +69,7 @@ module TrackingStrategy
 end
 ```
 
-In this case we need to create a `meta(job_id)` method so __default verify__ can send extra data (percentage) to JS.
-
-Job
----
+### Job
 
 ```ruby
 # app/jobs/process_image_job.rb
@@ -82,15 +79,14 @@ class ProcessImageJob < ActiveJob::Base
   tracking_strategy :process_image_strategy
 
   def perform(record)
-    # do some heavy processing ...
-    # update job percentage by using:
-    #   self.strategy.update_percentage(job_id, percentage)
+    # code to process image ...
+    # you could update job progress by using:
+    #   self.strategy.update_progress(job_id, percentage)
   end
 end
 ```
 
-Generate job method
----
+### Generate job method
 
 ```ruby
 class ImageController < ApplicationController
@@ -101,8 +97,15 @@ class ImageController < ApplicationController
 end
 ```
 
-JavaScript Create
----
+### HTML
+
+```html
+<div class="images">
+  <!-- ... -->
+</div>
+```
+
+### JavaScript Create
 
 ```javascript
 var imageCreated = function(data) {
@@ -131,13 +134,15 @@ Immortus.create('/process_image')
         });
 ```
 
-JavaScript Verify
----
+### JavaScript Verify
 
 We need this if we want the info to persist in a refresh
 
 ```html
-<div class="image-908ec6f1-e093-4943-b7a8-7c84eccfe417"><span class="loading-icon"></span></div>
+<div class="images">
+  <!-- ... -->
+  <div class="image-908ec6f1-e093-4943-b7a8-7c84eccfe417"><span class="loading-icon"></span></div>
+</div>
 ```
 
 ```javascript
