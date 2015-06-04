@@ -148,6 +148,7 @@ We need this if we want the info to persist in a refresh
 ```javascript
 // using some of the same functions from `JavaScript Create` section
 
+// In this case we need to explicitly set `job_class` to be sure we use the correct strategy
 var jobInfo = {
   job_id: '908ec6f1-e093-4943-b7a8-7c84eccfe417',
   job_class: 'ProcessImageJob'
@@ -156,5 +157,3 @@ var jobInfo = {
 Immortus.verify(jobInfo)
         .then(imageProcessed, imageNotProcessed, processingImage);
 ```
-
-In this case we need to send `job_class` so __default verify__ could know what job is working with
