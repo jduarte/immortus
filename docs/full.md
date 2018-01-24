@@ -170,12 +170,12 @@ Here is a list of the ActiveJob queue adapter and its mapped strategies:
 
 | ActiveJob QueueAdapter |    Inferred Strategy    |                      Wiki                      |
 |-----------------------:|:-----------------------:|:----------------------------------------------:|
-|           :delayed_job | :delayed\_job\_strategy | [How it works?](#delayed-job-strategy)  |
+|           :delayed_job | :delayed\_job\_strategy | [How it works?](#delayed-job-strategy)         |
 |            :backburner |           N/A           |                       N/A                      |
 |                    :qu |           N/A           |                       N/A                      |
 |                   :que |           N/A           |                       N/A                      |
 |         :queue_classic |           N/A           |                       N/A                      |
-|               :sidekiq |           N/A           |                       N/A                      |
+|               :sidekiq |    :sidekiq\_strategy   | [How it works?](#sidekiq-strategy)             |
 |              :sneakers |           N/A           |                       N/A                      |
 |          :sucker_punch |           N/A           |                       N/A                      |
 |                :inline |           N/A           |                       N/A                      |

@@ -9,7 +9,7 @@ module Immortus
       que:            :not_implemented,
       queue_classic:  :not_implemented,
       resque:         :not_implemented,
-      sidekiq:        :not_implemented,
+      sidekiq:        :sidekiq_strategy,
       sneakers:       :not_implemented,
       sucker_punch:   :not_implemented,
       inline:         :not_implemented,
