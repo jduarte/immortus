@@ -7,8 +7,8 @@ require "immortus/version"
 Gem::Specification.new do |s|
   s.name        = "immortus"
   s.version     = Immortus::VERSION
-  s.authors     = %Q{Runtime Revolution}
-  s.homepage    = "http://www.runtime-revolution.com/runtime"
+  s.authors     = %Q{Jose Duarte}
+  s.homepage    = ""
   s.summary     = %Q{Immortus is a background jobs tracking helper}
   s.description = %Q{A rails gem to help tracking your background jobs in your application}
   s.license     = "MIT"

@@ -1,13 +1,6 @@
 Immortus
 ===
 
-[![Gem Version](https://badge.fury.io/rb/immortus.svg)](http://badge.fury.io/rb/immortus)
-[![Build Status](https://travis-ci.org/runtimerevolution/immortus.svg?branch=master)](https://travis-ci.org/runtimerevolution/immortus)
-[![Code Climate](https://codeclimate.com/github/runtimerevolution/immortus/badges/gpa.svg)](https://codeclimate.com/github/runtimerevolution/immortus)
-[![Dependency Status](https://gemnasium.com/runtimerevolution/immortus.svg)](https://gemnasium.com/runtimerevolution/immortus)
-[![security](https://hakiri.io/github/runtimerevolution/immortus/master.svg)](https://hakiri.io/github/runtimerevolution/immortus/master)
-[![Coverage Status](https://coveralls.io/repos/runtimerevolution/immortus/badge.svg)](https://coveralls.io/r/runtimerevolution/immortus)
-
 ![Immortus](./docs/Immortus.jpg)
 
 > The ruler of Limbo, Immortus bartered with the near-omnipotent Time-Keepers for immortality, in exchange becoming their agent in preserving timelines at all costs, no matter how many lives get disrupted, ruined, or erased.
@@ -170,25 +163,3 @@ Future Developments
 * Support Web Sockets
 
 For more details see the [ROADMAP](./docs/ROADMAP.md)
-
-Contributing
----
-
-1. Fork it ( https://github.com/runtime-revolution/immortus/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
-
-License
----
-
-Copyright © 2015 [Runtime Revolution](http://www.runtime-revolution.com), released under the MIT license.
-
-About Runtime Revolution
----
-
-![Runtime Revolution](http://webpublishing.s3.amazonaws.com/runtime_small_logo.png)
-
-`Immortus` is maintained by [Runtime Revolution](http://www.runtime-revolution.com).
-See our [other projects](https://github.com/runtimerevolution/) and check out our [blog](http://www.runtime-revolution.com/runtime/blog) for the latest updates.

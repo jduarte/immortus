@@ -1,10 +1,10 @@
 var Immortus = (function () {
   var api = {};
 
-  api.create = function (url) {
-    return $.post(url, {
-      authenticity_token: $('[name="csrf-token"]')[0].content
-    }, null, 'json');
+  api.create = function (url, data) {
+    if (!data) { data = {}; }
+    data.authenticity_token = $('[name="csrf-token"]')[0].content;
+    return $.post(url, data, null, 'json');
   };
 
   api.verify = function (jobOptions, options) {
